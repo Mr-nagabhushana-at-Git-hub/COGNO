@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductiveFlow - Next Level Productivity App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca'
+                        },
+                        secondary: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        bounceGentle: {
+                            '0%, 20%, 50%, 80%, 100%': { transform: 'translateY(0)' },
+                            '40%': { transform: 'translateY(-10px)' },
+                            '60%': { transform: 'translateY(-5px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .matrix-cell {
+            transition: all 0.2s ease;
+        }
+        .matrix-cell:hover {
+            transform: scale(1.02);
+        }
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        .notification-toast {
+            animation: slideInRight 0.5s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .progress-circle {
+            transform: rotate(-90deg);
+        }
+        .monk-mode-overlay {
+            background: linear-gradient(45deg, #1a202c, #2d3748);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- @COMPONENT: AppHeader -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-rocket text-white text-sm"></i>
+                        </div>
+                        <h1 class="text-xl font-bold text-gray-900">ProductiveFlow</h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Monk Mode Toggle -->
+                    <button class="monk-mode-btn bg-purple-100 hover:bg-purple-200 text-purple-700 px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                        <i class="fas fa-zen-circle"></i>
+                        <span class="font-medium">Monk Mode</span>
+                    </button>
+                    
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    <!-- User Profile -->
+                    <div class="flex items-center space-x-3">
+                        <!-- A professional headshot of a smiling person in business attire -->
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=40&h=40" alt="User avatar" class="w-10 h-10 rounded-full ring-2 ring-primary-100">
+                        <div class="hidden md:block">
+                            <p class="text-sm font-medium text-gray-900" data-bind="user.name">Alex Johnson</p>
+                            <p class="text-xs text-gray-500">Pro Member</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: AppHeader -->
+
+    <div class="flex min-h-screen">
+        <!-- @COMPONENT: Sidebar -->
+        <aside class="w-64 bg-white shadow-sm border-r border-gray-200">
+            <nav class="mt-8 px-4">
+                <div class="space-y-2">
+                    <a href="#" class="bg-primary-50 border-r-4 border-primary-500 text-primary-700 group flex items-center px-4 py-3 text-sm font-medium rounded-l-lg">
+                        <i class="fas fa-home mr-3 text-primary-500"></i>
+                        Dashboard
+                    </a>
+                    
+                    <a href="#" class="text-gray-700 hover:bg-gray-50 group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-tasks mr-3 text-gray-400"></i>
+                        Tasks & Matrix
+                    </a>
+                    
+                    <a href="#" class="text-gray-700 hover:bg-gray-50 group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-calendar-alt mr-3 text-gray-400"></i>
+                        Calendar
+                    </a>
+                    
+                    <a href="#" class="text-gray-700 hover:bg-gray-50 group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-brain mr-3 text-gray-400"></i>
+                        Brain Training
+                    </a>
+                    
+                    <a href="#" class="text-gray-700 hover:bg-gray-50 group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-heartbeat mr-3 text-gray-400"></i>
+                        Fitness Tracker
+                    </a>
+                    
+                    <a href="#" class="text-gray-700 hover:bg-gray-50 group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-robot mr-3 text-gray-400"></i>
+                        AI Agents
+                    </a>
+                    
+                    <a href="#" class="text-gray-700 hover:bg-gray-50 group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors">
+                        <i class="fas fa-chart-line mr-3 text-gray-400"></i>
+                        Analytics
+                    </a>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="mt-8 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">Today's Progress</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-600">Tasks</span>
+                            <span class="text-xs font-semibold text-primary-600">8/12</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-primary-500 h-2 rounded-full" style="width: 67%"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-600">Focus Time</span>
+                            <span class="text-xs font-semibold text-secondary-600">4.2h</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-secondary-500 h-2 rounded-full" style="width: 84%"></div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar -->
+
+        <!-- @COMPONENT: MainContent -->
+        <main class="flex-1 p-8">
+            <!-- Hero Section with Quick Actions -->
+            <div class="mb-8">
+                <div class="gradient-bg rounded-2xl p-8 text-white relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h2 class="text-3xl font-bold mb-2">Good morning, Alex! 🌟</h2>
+                        <p class="text-lg opacity-90 mb-6">Ready to crush your goals today? You have 4 important tasks waiting.</p>
+                        
+                        <div class="flex flex-wrap gap-4">
+                            <button class="bg-white text-purple-700 px-6 py-3 rounded-lg font-medium hover:shadow-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-plus"></i>
+                                <span>Add Task</span>
+                            </button>
+                            
+                            <button class="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-medium hover:bg-white/30 transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-play"></i>
+                                <span>Start Focus Session</span>
+                            </button>
+                            
+                            <button class="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-medium hover:bg-white/30 transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-dumbbell"></i>
+                                <span>Quick Exercise</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Animated background elements -->
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32 animate-pulse-slow"></div>
+                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24 animate-bounce-gentle"></div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Eisenhower Matrix -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-semibold text-gray-900">Eisenhower Matrix</h3>
+                            <button class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                                <i class="fas fa-expand-arrows-alt mr-1"></i>
+                                Expand
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 h-96">
+                            <!-- Important & Urgent -->
+                            <div class="matrix-cell bg-red-50 border-2 border-red-200 rounded-lg p-4 hover:bg-red-100">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-medium text-red-800">Important & Urgent</h4>
+                                    <span class="bg-red-200 text-red-800 text-xs px-2 py-1 rounded-full">3</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-red-100 cursor-pointer hover:shadow-md transition-shadow" data-mock="true">
+                                        <p class="text-sm font-medium text-gray-900">Client presentation</p>
+                                        <p class="text-xs text-gray-500">Due: Today 3PM</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-red-100 cursor-pointer hover:shadow-md transition-shadow" data-mock="true">
+                                        <p class="text-sm font-medium text-gray-900">Fix critical bug</p>
+                                        <p class="text-xs text-gray-500">Due: Today 5PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Important & Not Urgent -->
+                            <div class="matrix-cell bg-green-50 border-2 border-green-200 rounded-lg p-4 hover:bg-green-100">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-medium text-green-800">Important & Not Urgent</h4>
+                                    <span class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full">5</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-green-100 cursor-pointer hover:shadow-md transition-shadow" data-mock="true">
+                                        <p class="text-sm font-medium text-gray-900">Learning new framework</p>
+                                        <p class="text-xs text-gray-500">This week</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-green-100 cursor-pointer hover:shadow-md transition-shadow" data-mock="true">
+                                        <p class="text-sm font-medium text-gray-900">Exercise routine</p>
+                                        <p class="text-xs text-gray-500">Daily</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Not Important & Urgent -->
+                            <div class="matrix-cell bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 hover:bg-yellow-100">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-medium text-yellow-800">Not Important & Urgent</h4>
+                                    <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">2</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-yellow-100 cursor-pointer hover:shadow-md transition-shadow" data-mock="true">
+                                        <p class="text-sm font-medium text-gray-900">Team meeting</p>
+                                        <p class="text-xs text-gray-500">Today 2PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Not Important & Not Urgent -->
+                            <div class="matrix-cell bg-gray-50 border-2 border-gray-200 rounded-lg p-4 hover:bg-gray-100">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-medium text-gray-800">Not Important & Not Urgent</h4>
+                                    <span class="bg-gray-200 text-gray-800 text-xs px-2 py-1 rounded-full">1</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 cursor-pointer hover:shadow-md transition-shadow" data-mock="true">
+                                        <p class="text-sm font-medium text-gray-900">Social media check</p>
+                                        <p class="text-xs text-gray-500">Later</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar - Today's Focus -->
+                <div class="space-y-6">
+                    <!-- Current Focus Session -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Current Focus</h3>
+                        
+                        <div class="text-center">
+                            <div class="relative w-24 h-24 mx-auto mb-4">
+                                <svg class="progress-circle w-24 h-24">
+                                    <circle cx="48" cy="48" r="40" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                                    <circle cx="48" cy="48" r="40" stroke="#6366f1" stroke-width="8" fill="none" 
+                                            stroke-dasharray="251.2" stroke-dashoffset="75.36" stroke-linecap="round"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-xl font-bold text-primary-600">25:00</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-sm font-medium text-gray-900 mb-2">Client Presentation Prep</p>
+                            <p class="text-xs text-gray-500 mb-4">Pomodoro Session 2/4</p>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors">
+                                    <i class="fas fa-pause mr-1"></i>
+                                    Pause
+                                </button>
+                                <button class="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                    <i class="fas fa-stop mr-1"></i>
+                                    Stop
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Today's Stats</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-clock text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Focus Time</p>
+                                        <p class="text-xs text-gray-500">4h 23m</p>
+                                    </div>
+                                </div>
+                                <span class="text-blue-600 font-semibold">+12%</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Tasks Done</p>
+                                        <p class="text-xs text-gray-500">8 of 12</p>
+                                    </div>
+                                </div>
+                                <span class="text-green-600 font-semibold">67%</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-brain text-purple-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Brain Training</p>
+                                        <p class="text-xs text-gray-500">15 min</p>
+                                    </div>
+                                </div>
+                                <span class="text-purple-600 font-semibold">3 games</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-heartbeat text-red-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Steps</p>
+                                        <p class="text-xs text-gray-500">8,245</p>
+                                    </div>
+                                </div>
+                                <span class="text-red-600 font-semibold">82%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Brain Training Card -->
+                <div class="card-hover bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-brain text-purple-600 text-xl"></i>
+                        </div>
+                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">New</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Brain Training</h3>
+                    <p class="text-sm text-gray-600 mb-4">Boost cognitive performance with memory games and puzzles</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Next: Memory Challenge</span>
+                        <i class="fas fa-arrow-right text-purple-600"></i>
+                    </div>
+                </div>
+
+                <!-- Fitness Tracking Card -->
+                <div class="card-hover bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-dumbbell text-red-600 text-xl"></i>
+                        </div>
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Fitness Tracker</h3>
+                    <p class="text-sm text-gray-600 mb-4">AI-powered exercise monitoring with real-time feedback</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Camera guided workout</span>
+                        <i class="fas fa-video text-red-600"></i>
+                    </div>
+                </div>
+
+                <!-- AI Agents Card -->
+                <div class="card-hover bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-robot text-cyan-600 text-xl"></i>
+                        </div>
+                        <span class="bg-cyan-100 text-cyan-800 text-xs px-2 py-1 rounded-full">5 Active</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">AI Agents</h3>
+                    <p class="text-sm text-gray-600 mb-4">Automated email, scheduling, and calendar management</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">n8n Integration</span>
+                        <i class="fas fa-cog text-cyan-600"></i>
+                    </div>
+                </div>
+
+                <!-- Analytics Card -->
+                <div class="card-hover bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                        </div>
+                        <i class="fas fa-trending-up text-green-600"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Analytics</h3>
+                    <p class="text-sm text-gray-600 mb-4">Track productivity patterns and performance insights</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Weekly Report Ready</span>
+                        <i class="fas fa-download text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity & Calendar -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900">Recent Activity</h3>
+                        <button class="text-primary-600 hover:text-primary-700 text-sm font-medium">View All</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors" data-mock="true">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Completed "Website Redesign Research"</p>
+                                <p class="text-xs text-gray-500">2 minutes ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors" data-mock="true">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Started focus session for "Client Presentation"</p>
+                                <p class="text-xs text-gray-500">15 minutes ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors" data-mock="true">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Completed brain training - Memory Challenge</p>
+                                <p class="text-xs text-gray-500">1 hour ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors" data-mock="true">
+                            <div class="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Finished 20-minute guided workout</p>
+                                <p class="text-xs text-gray-500">2 hours ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors" data-mock="true">
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">AI Agent sent 3 automated emails</p>
+                                <p class="text-xs text-gray-500">3 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mini Calendar & Upcoming -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900">Today's Schedule</h3>
+                        <button class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                            <i class="fas fa-calendar-plus mr-1"></i>
+                            Add Event
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg" data-mock="true">
+                            <div class="text-center">
+                                <p class="text-xs text-blue-600 font-medium">2:00 PM</p>
+                                <p class="text-xs text-blue-500">30min</p>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Team Standup Meeting</p>
+                                <p class="text-xs text-gray-500">Conference Room A</p>
+                            </div>
+                            <i class="fas fa-video text-blue-600"></i>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-3 bg-green-50 border-l-4 border-green-500 rounded-r-lg" data-mock="true">
+                            <div class="text-center">
+                                <p class="text-xs text-green-600 font-medium">3:00 PM</p>
+                                <p class="text-xs text-green-500">60min</p>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Client Presentation</p>
+                                <p class="text-xs text-gray-500">Important & Urgent</p>
+                            </div>
+                            <i class="fas fa-exclamation-triangle text-green-600"></i>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-3 bg-purple-50 border-l-4 border-purple-500 rounded-r-lg" data-mock="true">
+                            <div class="text-center">
+                                <p class="text-xs text-purple-600 font-medium">5:30 PM</p>
+                                <p class="text-xs text-purple-500">20min</p>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Brain Training Session</p>
+                                <p class="text-xs text-gray-500">Logic Puzzles</p>
+                            </div>
+                            <i class="fas fa-brain text-purple-600"></i>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg" data-mock="true">
+                            <div class="text-center">
+                                <p class="text-xs text-red-600 font-medium">6:00 PM</p>
+                                <p class="text-xs text-red-500">45min</p>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Evening Workout</p>
+                                <p class="text-xs text-gray-500">Camera-guided session</p>
+                            </div>
+                            <i class="fas fa-dumbbell text-red-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+    </div>
+
+    <!-- @COMPONENT: FloatingActionButton -->
+    <div class="floating-action">
+        <button class="bg-primary-500 hover:bg-primary-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group">
+            <i class="fas fa-plus text-xl group-hover:rotate-90 transition-transform duration-200"></i>
+        </button>
+    </div>
+    <!-- @END_COMPONENT: FloatingActionButton -->
+
+    <!-- @COMPONENT: NotificationToast -->
+    <div class="fixed top-20 right-4 z-50 space-y-2" id="notifications">
+        <div class="notification-toast bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm" data-mock="true">
+            <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-clock text-blue-600"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-900">Focus session starting soon</p>
+                    <p class="text-xs text-gray-500">Client Presentation prep in 5 minutes</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: NotificationToast -->
+
+    <!-- @COMPONENT: MonkModeModal (Hidden by default) -->
+    <div class="hidden fixed inset-0 z-50 monk-mode-overlay" id="monk-mode-modal">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+                <div class="mb-6">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-zen-circle text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Enter Monk Mode</h3>
+                    <p class="text-gray-600">Block all distractions and focus on your most important task</p>
+                </div>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Focus Duration</label>
+                        <select class="w-full p-2 border border-gray-300 rounded-lg">
+                            <option>25 minutes (Pomodoro)</option>
+                            <option>45 minutes</option>
+                            <option>90 minutes (Deep Work)</option>
+                            <option>Custom</option>
+                        </select>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Block Level</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-gray-300 text-purple-600" checked>
+                                <span class="ml-2 text-sm text-gray-700">Social Media</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-gray-300 text-purple-600" checked>
+                                <span class="ml-2 text-sm text-gray-700">Entertainment</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="rounded border-gray-300 text-purple-600">
+                                <span class="ml-2 text-sm text-gray-700">All Notifications</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button class="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors" onclick="document.getElementById('monk-mode-modal').classList.add('hidden')">
+                        Cancel
+                    </button>
+                    <button class="flex-1 bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors">
+                        Start Focus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: MonkModeModal -->
+
+    <script>
+        (function() {
+            // TODO: Implement business logic, API calls, or state management
+
+            // Monk Mode Modal Toggle
+            const monkModeBtn = document.querySelector('.monk-mode-btn');
+            const monkModeModal = document.getElementById('monk-mode-modal');
+            
+            monkModeBtn?.addEventListener('click', () => {
+                monkModeModal?.classList.toggle('hidden');
+            });
+
+            // Progress Circle Animation
+            const progressCircle = document.querySelector('.progress-circle circle:last-child');
+            if (progressCircle) {
+                // Animate progress circle on load
+                setTimeout(() => {
+                    progressCircle.style.strokeDashoffset = '62.8'; // 75% progress
+                }, 500);
+            }
+
+            // Card Hover Effects Enhancement
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Auto-hide notifications
+            setTimeout(() => {
+                const notifications = document.querySelectorAll('.notification-toast');
+                notifications.forEach(notification => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                });
+            }, 5000);
+
+            // Matrix cell drag and drop placeholder
+            const matrixCells = document.querySelectorAll('.matrix-cell');
+            matrixCells.forEach(cell => {
+                cell.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    cell.classList.add('bg-opacity-50');
+                });
+                
+                cell.addEventListener('dragleave', (e) => {
+                    cell.classList.remove('bg-opacity-50');
+                });
+            });
+
+            // Floating Action Button rotation
+            const fab = document.querySelector('.floating-action button');
+            fab?.addEventListener('click', () => {
+                // TODO: Implement add task modal or quick action menu
+                console.log('Quick action triggered');
+            });
+
+            // Animate stats on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards for animations
+            document.querySelectorAll('.card-hover, .matrix-cell').forEach(el => {
+                observer.observe(el);
+            });
+
+        })();
+    </script>
+</body>
+</html>

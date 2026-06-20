@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductiviZen - Advanced Productivity Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'ui-sans-serif', 'system-ui'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#5b21b6',
+                            700: '#4c1d95'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'pulse-subtle': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- @COMPONENT: Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-zen-circle text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">ProductiviZen</h1>
+                </div>
+                
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#dashboard" class="text-indigo-600 hover:text-indigo-800 px-3 py-2 text-sm font-medium border-b-2 border-indigo-600">Dashboard</a>
+                    <a href="#tasks" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Tasks</a>
+                    <a href="#focus" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Focus</a>
+                    <a href="#wellness" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Wellness</a>
+                    <a href="#analytics" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">Analytics</a>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 relative">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400"></span>
+                    </button>
+                    <div class="flex items-center space-x-3">
+                        <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=32&h=32" alt="User avatar" data-mock="true">
+                        <span class="text-sm font-medium text-gray-700" data-bind="user.name">Alex Johnson</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- @COMPONENT: StatsOverview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover animate-fade-in">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-indigo-100">
+                        <i class="fas fa-tasks text-indigo-600 text-lg"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Today's Tasks</p>
+                        <p class="text-2xl font-bold text-gray-900" data-bind="stats.tasksToday">12</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style="width: 75%"></div>
+                        </div>
+                        <span class="ml-2 text-sm text-gray-500">75%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover animate-fade-in" style="animation-delay: 0.1s">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-emerald-100">
+                        <i class="fas fa-fire text-emerald-600 text-lg"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Focus Streak</p>
+                        <p class="text-2xl font-bold text-gray-900" data-bind="stats.focusStreak">7 days</p>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm text-emerald-600">
+                    <i class="fas fa-arrow-up text-xs mr-1"></i>
+                    <span>+2 from yesterday</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover animate-fade-in" style="animation-delay: 0.2s">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-amber-100">
+                        <i class="fas fa-brain text-amber-600 text-lg"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Brain Score</p>
+                        <p class="text-2xl font-bold text-gray-900" data-bind="stats.brainScore">850</p>
+                    </div>
+                </div>
+                <div class="mt-4 flex items-center text-sm text-amber-600">
+                    <i class="fas fa-trophy text-xs mr-1"></i>
+                    <span>Top 15%</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover animate-fade-in" style="animation-delay: 0.3s">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-rose-100">
+                        <i class="fas fa-heartbeat text-rose-600 text-lg"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Steps Today</p>
+                        <p class="text-2xl font-bold text-gray-900" data-bind="stats.stepsToday">8,234</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-rose-500 to-pink-600 h-2 rounded-full" style="width: 82%"></div>
+                        </div>
+                        <span class="ml-2 text-sm text-gray-500">82%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: StatsOverview -->
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- @COMPONENT: EisenhowerMatrix -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 animate-slide-up">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Eisenhower Matrix</h2>
+                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                        <i class="fas fa-plus mr-1"></i>Add Task
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 h-96">
+                    <div class="border-2 border-dashed border-red-200 rounded-lg p-4 bg-red-50">
+                        <div class="flex items-center mb-3">
+                            <div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                            <h3 class="font-semibold text-red-900">Urgent & Important</h3>
+                        </div>
+                        <div class="space-y-2" data-implementation="Drag & drop zone for urgent important tasks">
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500 cursor-move hover:shadow-md transition-shadow" data-mock="true">
+                                <p class="text-sm font-medium text-gray-900">Fix critical bug in production</p>
+                                <p class="text-xs text-gray-500 mt-1">Due: 2 hours</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500 cursor-move hover:shadow-md transition-shadow" data-mock="true">
+                                <p class="text-sm font-medium text-gray-900">Submit project proposal</p>
+                                <p class="text-xs text-gray-500 mt-1">Due: Today</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-dashed border-amber-200 rounded-lg p-4 bg-amber-50">
+                        <div class="flex items-center mb-3">
+                            <div class="w-3 h-3 bg-amber-500 rounded-full mr-2"></div>
+                            <h3 class="font-semibold text-amber-900">Not Urgent but Important</h3>
+                        </div>
+                        <div class="space-y-2" data-implementation="Drag & drop zone for important not urgent tasks">
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-amber-500 cursor-move hover:shadow-md transition-shadow" data-mock="true">
+                                <p class="text-sm font-medium text-gray-900">Plan next quarter strategy</p>
+                                <p class="text-xs text-gray-500 mt-1">Due: Next week</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-amber-500 cursor-move hover:shadow-md transition-shadow" data-mock="true">
+                                <p class="text-sm font-medium text-gray-900">Learn new programming language</p>
+                                <p class="text-xs text-gray-500 mt-1">No deadline</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-dashed border-blue-200 rounded-lg p-4 bg-blue-50">
+                        <div class="flex items-center mb-3">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                            <h3 class="font-semibold text-blue-900">Urgent but Not Important</h3>
+                        </div>
+                        <div class="space-y-2" data-implementation="Drag & drop zone for urgent not important tasks">
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500 cursor-move hover:shadow-md transition-shadow" data-mock="true">
+                                <p class="text-sm font-medium text-gray-900">Answer non-critical emails</p>
+                                <p class="text-xs text-gray-500 mt-1">Due: Today</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-dashed border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <div class="flex items-center mb-3">
+                            <div class="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
+                            <h3 class="font-semibold text-gray-700">Neither Urgent nor Important</h3>
+                        </div>
+                        <div class="space-y-2" data-implementation="Drag & drop zone for low priority tasks">
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-gray-500 cursor-move hover:shadow-md transition-shadow" data-mock="true">
+                                <p class="text-sm font-medium text-gray-900">Organize digital photos</p>
+                                <p class="text-xs text-gray-500 mt-1">Someday</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: EisenhowerMatrix -->
+
+            <!-- @COMPONENT: MonkModeTimer -->
+            <div class="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl shadow-sm p-6 text-white animate-slide-up" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold">Monk Mode</h2>
+                    <i class="fas fa-om text-2xl opacity-70"></i>
+                </div>
+                
+                <div class="text-center mb-8">
+                    <div class="relative w-32 h-32 mx-auto mb-4">
+                        <svg class="w-32 h-32 transform -rotate-90">
+                            <circle cx="64" cy="64" r="56" stroke="rgba(255,255,255,0.2)" stroke-width="8" fill="transparent"></circle>
+                            <circle cx="64" cy="64" r="56" stroke="white" stroke-width="8" fill="transparent" 
+                                stroke-dasharray="351.86" stroke-dashoffset="87.97" class="transition-all duration-300"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold" data-bind="timer.current">25:00</div>
+                                <div class="text-sm opacity-80">Focus Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm opacity-90">Session Type</span>
+                        <select class="bg-white/10 text-white rounded-lg px-3 py-1 text-sm border border-white/20">
+                            <option>Pomodoro (25min)</option>
+                            <option>Deep Work (90min)</option>
+                            <option>Custom</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm opacity-90">Block Distractions</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex space-x-2 mt-6">
+                    <button class="flex-1 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-colors" data-event="click:startTimer">
+                        <i class="fas fa-play mr-2"></i>Start
+                    </button>
+                    <button class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors" data-event="click:pauseTimer">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors" data-event="click:resetTimer">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                </div>
+
+                <div class="mt-6 p-4 bg-white/10 rounded-lg">
+                    <div class="flex items-center justify-between text-sm">
+                        <span>Today's Sessions</span>
+                        <span class="font-semibold" data-bind="stats.sessionsToday">3/6</span>
+                    </div>
+                    <div class="flex space-x-1 mt-2">
+                        <div class="flex-1 h-2 bg-emerald-400 rounded"></div>
+                        <div class="flex-1 h-2 bg-emerald-400 rounded"></div>
+                        <div class="flex-1 h-2 bg-emerald-400 rounded"></div>
+                        <div class="flex-1 h-2 bg-white/30 rounded"></div>
+                        <div class="flex-1 h-2 bg-white/30 rounded"></div>
+                        <div class="flex-1 h-2 bg-white/30 rounded"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: MonkModeTimer -->
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- @COMPONENT: BrainExercises -->
+            <div class="bg-white rounded-xl shadow-sm p-6 animate-slide-up" style="animation-delay: 0.4s">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Brain Exercises</h2>
+                    <div class="text-sm text-gray-500">
+                        Daily streak: <span class="font-semibold text-amber-600" data-bind="brain.streak">12 days</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-gradient-to-br from-pink-50 to-rose-100 rounded-lg card-hover cursor-pointer" data-event="click:openMemoryGame">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-brain text-rose-600 text-lg mr-2"></i>
+                            <h3 class="font-semibold text-rose-900">Memory</h3>
+                        </div>
+                        <p class="text-sm text-rose-700 mb-3">Pattern recognition and recall exercises</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-rose-600 bg-rose-200 px-2 py-1 rounded-full">Level 7</span>
+                            <span class="text-xs text-rose-700">+50 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg card-hover cursor-pointer" data-event="click:openLogicGame">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-puzzle-piece text-indigo-600 text-lg mr-2"></i>
+                            <h3 class="font-semibold text-indigo-900">Logic</h3>
+                        </div>
+                        <p class="text-sm text-indigo-700 mb-3">Problem solving and reasoning challenges</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-indigo-600 bg-indigo-200 px-2 py-1 rounded-full">Level 5</span>
+                            <span class="text-xs text-indigo-700">+75 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-gradient-to-br from-emerald-50 to-green-100 rounded-lg card-hover cursor-pointer" data-event="click:openMathGame">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-calculator text-emerald-600 text-lg mr-2"></i>
+                            <h3 class="font-semibold text-emerald-900">Math</h3>
+                        </div>
+                        <p class="text-sm text-emerald-700 mb-3">Quick calculations and number puzzles</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-emerald-600 bg-emerald-200 px-2 py-1 rounded-full">Level 9</span>
+                            <span class="text-xs text-emerald-700">+25 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-gradient-to-br from-purple-50 to-violet-100 rounded-lg card-hover cursor-pointer" data-event="click:openWordGame">
+                        <div class="flex items-center mb-3">
+                            <i class="fas fa-spell-check text-violet-600 text-lg mr-2"></i>
+                            <h3 class="font-semibold text-violet-900">Words</h3>
+                        </div>
+                        <p class="text-sm text-violet-700 mb-3">Vocabulary and language exercises</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-violet-600 bg-violet-200 px-2 py-1 rounded-full">Level 6</span>
+                            <span class="text-xs text-violet-700">+40 pts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Today's Progress</span>
+                        <span class="text-sm text-gray-500">3/5 completed</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-500" style="width: 60%"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: BrainExercises -->
+
+            <!-- @COMPONENT: FitnessTracking -->
+            <div class="bg-white rounded-xl shadow-sm p-6 animate-slide-up" style="animation-delay: 0.5s">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Fitness Tracking</h2>
+                    <button class="text-rose-600 hover:text-rose-800 text-sm font-medium">
+                        <i class="fas fa-video mr-1"></i>Start Workout
+                    </button>
+                </div>
+
+                <!-- Live Workout Section -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-rose-500 to-pink-600 rounded-lg text-white">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold">AI Workout Coach</h3>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse-subtle"></div>
+                            <span class="text-xs">Camera Ready</span>
+                        </div>
+                    </div>
+                    <p class="text-sm opacity-90 mb-4">Start your guided workout. AI will monitor your form and provide real-time feedback.</p>
+                    <button class="w-full bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors" data-event="click:startAIWorkout">
+                        <i class="fas fa-camera mr-2"></i>Enable Camera & Start
+                    </button>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <i class="fas fa-walking text-2xl text-gray-600 mb-2"></i>
+                        <div class="text-2xl font-bold text-gray-900" data-bind="fitness.steps">8,234</div>
+                        <div class="text-sm text-gray-500">Steps</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <i class="fas fa-fire text-2xl text-orange-500 mb-2"></i>
+                        <div class="text-2xl font-bold text-gray-900" data-bind="fitness.calories">342</div>
+                        <div class="text-sm text-gray-500">Calories</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <i class="fas fa-clock text-2xl text-blue-500 mb-2"></i>
+                        <div class="text-2xl font-bold text-gray-900" data-bind="fitness.activeTime">45</div>
+                        <div class="text-sm text-gray-500">Minutes</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-50 rounded-lg">
+                        <i class="fas fa-heartbeat text-2xl text-red-500 mb-2"></i>
+                        <div class="text-2xl font-bold text-gray-900" data-bind="fitness.heartRate">72</div>
+                        <div class="text-sm text-gray-500">BPM</div>
+                    </div>
+                </div>
+
+                <!-- Workout Programs -->
+                <div>
+                    <h4 class="font-semibold text-gray-900 mb-3">Quick Workouts</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" data-event="click:selectWorkout">
+                            <div class="flex items-center">
+                                <i class="fas fa-dumbbell text-gray-600 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-900">7-Minute Workout</div>
+                                    <div class="text-sm text-gray-500">High intensity bodyweight</div>
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500">7 min</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" data-event="click:selectWorkout">
+                            <div class="flex items-center">
+                                <i class="fas fa-leaf text-green-600 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-900">Morning Yoga</div>
+                                    <div class="text-sm text-gray-500">Gentle stretching routine</div>
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500">15 min</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer" data-event="click:selectWorkout">
+                            <div class="flex items-center">
+                                <i class="fas fa-running text-blue-600 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-900">HIIT Cardio</div>
+                                    <div class="text-sm text-gray-500">High intensity intervals</div>
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500">20 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: FitnessTracking -->
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- @COMPONENT: TaskManager -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 animate-slide-up" style="animation-delay: 0.6s">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Task Management</h2>
+                    <div class="flex items-center space-x-2">
+                        <select class="text-sm border border-gray-300 rounded-lg px-3 py-1">
+                            <option>All Tasks</option>
+                            <option>Today</option>
+                            <option>This Week</option>
+                            <option>Overdue</option>
+                        </select>
+                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                            <i class="fas fa-plus mr-1"></i>New Task
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Task Categories -->
+                <div class="flex space-x-4 mb-6">
+                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium">All</button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Work</button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Personal</button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Health</button>
+                    <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200">Learning</button>
+                </div>
+
+                <!-- Task List -->
+                <div class="space-y-3" data-implementation="Task list with CRUD operations">
+                    <!-- @MAP: tasks.map(task => ( -->
+                    <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-mock="true">
+                        <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-4">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-medium text-gray-900">Complete project documentation</h4>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Work</span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">High</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-2 text-sm text-gray-500">
+                                <i class="fas fa-calendar mr-2"></i>
+                                <span>Due: Tomorrow, 5:00 PM</span>
+                                <i class="fas fa-user ml-4 mr-2"></i>
+                                <span>Assigned to: You</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 ml-4">
+                            <button class="text-gray-400 hover:text-indigo-600" data-event="click:editTask">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-gray-400 hover:text-red-600" data-event="click:deleteTask">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-mock="true">
+                        <input type="checkbox" checked class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-4">
+                        <div class="flex-1 opacity-60">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-medium text-gray-900 line-through">Review team feedback</h4>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Personal</span>
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Medium</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-2 text-sm text-gray-500">
+                                <i class="fas fa-check mr-2 text-green-500"></i>
+                                <span>Completed 2 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-mock="true">
+                        <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-4">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-medium text-gray-900">Schedule dentist appointment</h4>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Health</span>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Low</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-2 text-sm text-gray-500">
+                                <i class="fas fa-calendar mr-2"></i>
+                                <span>Due: This week</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 ml-4">
+                            <button class="text-gray-400 hover:text-indigo-600" data-event="click:editTask">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-gray-400 hover:text-red-600" data-event="click:deleteTask">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+            </div>
+            <!-- @END_COMPONENT: TaskManager -->
+
+            <!-- @COMPONENT: AgentIntegrations -->
+            <div class="bg-white rounded-xl shadow-sm p-6 animate-slide-up" style="animation-delay: 0.7s">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">AI Agents</h2>
+                    <i class="fas fa-robot text-2xl text-indigo-600"></i>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                                <h3 class="font-semibold text-gray-900">Email Assistant</h3>
+                            </div>
+                            <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Auto-replies and email scheduling</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">Last action: 2 min ago</span>
+                            <button class="text-indigo-600 hover:text-indigo-800" data-event="click:configureAgent">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                                <h3 class="font-semibold text-gray-900">Calendar Sync</h3>
+                            </div>
+                            <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Smart scheduling and meeting prep</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">Next meeting: 3:30 PM</span>
+                            <button class="text-indigo-600 hover:text-indigo-800" data-event="click:configureAgent">Configure</button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                                <h3 class="font-semibold text-gray-900">Data Analyzer</h3>
+                            </div>
+                            <span class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">Inactive</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Productivity insights and reports</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">Never run</span>
+                            <button class="text-indigo-600 hover:text-indigo-800" data-event="click:activateAgent">Activate</button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-indigo-300 transition-colors">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                                <h3 class="font-semibold text-gray-900">Task Optimizer</h3>
+                            </div>
+                            <span class="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded-full">Learning</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">AI-powered task prioritization</p>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500">Analyzing patterns...</span>
+                            <button class="text-indigo-600 hover:text-indigo-800" data-event="click:configureAgent">Configure</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="w-full mt-6 p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors" data-event="click:addAgent">
+                    <i class="fas fa-plus mr-2"></i>Add New Agent
+                </button>
+            </div>
+            <!-- @END_COMPONENT: AgentIntegrations -->
+        </div>
+    </main>
+
+    <!-- @COMPONENT: NotificationToast -->
+    <div id="notification-toast" class="fixed top-4 right-4 z-50 opacity-0 transform translate-x-full transition-all duration-300" data-implementation="Toast notification system">
+        <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm border-l-4 border-indigo-500">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-bell text-indigo-600"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900" data-bind="notification.title">Focus session starting!</p>
+                    <p class="text-sm text-gray-500 mt-1" data-bind="notification.message">Your 25-minute deep work session is about to begin.</p>
+                </div>
+                <div class="ml-4 flex-shrink-0">
+                    <button class="text-gray-400 hover:text-gray-600" data-event="click:dismissNotification">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: NotificationToast -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        
+        // Basic interaction handlers (for demo purposes only)
+        (function() {
+            // Simple timer display update (not functional - just for mockup)
+            let timerRunning = false;
+            
+            // Notification toast demo
+            function showNotification(title, message) {
+                const toast = document.getElementById('notification-toast');
+                if (toast) {
+                    toast.querySelector('[data-bind="notification.title"]').textContent = title;
+                    toast.querySelector('[data-bind="notification.message"]').textContent = message;
+                    toast.classList.remove('opacity-0', 'translate-x-full');
+                    setTimeout(() => {
+                        toast.classList.add('opacity-0', 'translate-x-full');
+                    }, 4000);
+                }
+            }
+
+            // Demo notification on page load
+            setTimeout(() => {
+                showNotification('Welcome back!', 'Ready to boost your productivity today?');
+            }, 1500);
+
+            // Add some basic hover effects and animations
+            document.addEventListener('DOMContentLoaded', function() {
+                const cards = document.querySelectorAll('.card-hover');
+                cards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-4px)';
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProFlow - Next-Level Productivity Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    'inter': ['Inter', 'sans-serif'],
+                    'mono': ['JetBrains Mono', 'monospace'],
+                },
+                colors: {
+                    primary: '#6366F1',
+                    secondary: '#8B5CF6',
+                    accent: '#06B6D4',
+                    success: '#10B981',
+                    warning: '#F59E0B',
+                    danger: '#EF4444',
+                    dark: '#1E293B',
+                    light: '#F8FAFC',
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.4s ease-out',
+                    'slide-up': 'slideUp 0.4s ease-out',
+                    'scale-in': 'scaleIn 0.3s ease-out',
+                    'bounce-subtle': 'bounceSubtle 0.6s ease-out',
+                    'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                    'float': 'float 3s ease-in-out infinite',
+                },
+                backdropBlur: {
+                    xs: '2px',
+                },
+            }
+        }
+    };
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes bounceSubtle {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.6); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .neomorphism {
+            background: #f0f0f0;
+            box-shadow: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+        }
+        .neomorphism-dark {
+            background: #2a2a2a;
+            box-shadow: 8px 8px 16px #1a1a1a, -8px -8px 16px #3a3a3a;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animated-border {
+            position: relative;
+            background: linear-gradient(45deg, #6366F1, #8B5CF6, #06B6D4, #10B981);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            padding: 2px;
+            border-radius: 12px;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .progress-ring {
+            transition: stroke-dasharray 0.3s ease-in-out;
+        }
+        .stagger-animation {
+            animation-fill-mode: both;
+        }
+        .stagger-animation:nth-child(1) { animation-delay: 0ms; }
+        .stagger-animation:nth-child(2) { animation-delay: 100ms; }
+        .stagger-animation:nth-child(3) { animation-delay: 200ms; }
+        .stagger-animation:nth-child(4) { animation-delay: 300ms; }
+        .stagger-animation:nth-child(5) { animation-delay: 400ms; }
+        .particle-bg {
+            background-image: radial-gradient(2px 2px at 20px 30px, rgba(99, 102, 241, 0.3), transparent),
+                              radial-gradient(2px 2px at 40px 70px, rgba(139, 92, 246, 0.3), transparent),
+                              radial-gradient(1px 1px at 90px 40px, rgba(6, 182, 212, 0.3), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: particleMove 10s linear infinite;
+        }
+        @keyframes particleMove {
+            from { background-position: 0 0; }
+            to { background-position: 200px 100px; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-inter text-gray-800 overflow-x-hidden">
+    
+    <!-- Navigation -->
+    <!-- @COMPONENT: Navigation [sticky header with glass morphism] -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-morphism border-b border-white/20 animate-fade-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center animate-pulse-glow">
+                        <i class="fas fa-infinity text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">ProFlow</span>
+                </div>
+                
+                <!-- Navigation Items -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors duration-300 font-medium">Dashboard</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors duration-300 font-medium">Tasks</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors duration-300 font-medium">Calendar</a>
+                    <a href="#" class="text-gray-700 hover:text-primary transition-colors duration-300 font-medium">Wellness</a>
+                </div>
+                
+                <!-- User Profile -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notification Bell -->
+                    <div class="relative hover-lift cursor-pointer">
+                        <i class="fas fa-bell text-gray-600 text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-danger rounded-full animate-bounce-subtle"></span>
+                    </div>
+                    
+                    <!-- User Avatar -->
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full flex items-center justify-center text-white font-semibold hover-lift cursor-pointer">
+                        JD
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- @END_COMPONENT: Navigation -->
+    
+    <!-- Main Content -->
+    <main class="pt-20 min-h-screen">
+        <!-- Hero Section -->
+        <!-- @COMPONENT: Hero [animated welcome section with particles] -->
+        <section class="relative py-12 particle-bg overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center animate-slide-up">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                        <span class="gradient-text">Elevate Your</span>
+                        <br>
+                        <span class="text-gray-800">Productivity</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                        The ultimate productivity suite with AI agents, wellness tracking, and next-level animations
+                    </p>
+                    
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                        <div class="glass-morphism rounded-2xl p-6 hover-lift stagger-animation animate-scale-in">
+                            <div class="text-3xl font-bold text-primary mb-2" data-bind="stats.tasksCompleted">24</div>
+                            <div class="text-gray-600">Tasks Completed</div>
+                        </div>
+                        <div class="glass-morphism rounded-2xl p-6 hover-lift stagger-animation animate-scale-in">
+                            <div class="text-3xl font-bold text-success mb-2" data-bind="stats.focusMinutes">180</div>
+                            <div class="text-gray-600">Focus Minutes</div>
+                        </div>
+                        <div class="glass-morphism rounded-2xl p-6 hover-lift stagger-animation animate-scale-in">
+                            <div class="text-3xl font-bold text-accent mb-2" data-bind="stats.workoutSessions">3</div>
+                            <div class="text-gray-600">Workouts</div>
+                        </div>
+                        <div class="glass-morphism rounded-2xl p-6 hover-lift stagger-animation animate-scale-in">
+                            <div class="text-3xl font-bold text-warning mb-2" data-bind="stats.brainScore">85%</div>
+                            <div class="text-gray-600">Brain Score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: Hero -->
+        
+        <!-- Dashboard Grid -->
+        <!-- @COMPONENT: Dashboard [main productivity widgets] -->
+        <section class="py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Left Column -->
+                    <div class="lg:col-span-2 space-y-8">
+                        
+                        <!-- Eisenhower Matrix -->
+                        <!-- @COMPONENT: EisenhowerMatrix [drag-and-drop task prioritization] -->
+                        <div class="glass-morphism rounded-3xl p-8 animate-fade-in">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold text-gray-800">Priority Matrix</h2>
+                                <div class="flex space-x-2">
+                                    <button class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all duration-300 hover:scale-105">
+                                        <i class="fas fa-plus mr-2"></i>Add Task
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Matrix Grid -->
+                            <div class="grid grid-cols-2 gap-4 h-96">
+                                <!-- Urgent & Important -->
+                                <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-4 relative group hover:bg-red-100 transition-colors duration-300">
+                                    <div class="absolute top-4 left-4">
+                                        <h3 class="font-semibold text-red-700">Do First</h3>
+                                        <p class="text-sm text-red-600">Urgent & Important</p>
+                                    </div>
+                                    
+                                    <!-- Task Cards -->
+                                    <!-- @MAP: urgentImportantTasks.map(task => ( -->
+                                    <div class="mt-16 space-y-3" data-drop-zone="urgent-important">
+                                        <div class="bg-white rounded-xl p-4 shadow-sm hover-lift cursor-move border border-red-100" draggable="true">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-gray-700" data-bind="task.title">Fix critical bug</span>
+                                                <i class="fas fa-grip-dots-vertical text-gray-400"></i>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1" data-bind="task.deadline">Due: Today</div>
+                                        </div>
+                                        <div class="bg-white rounded-xl p-4 shadow-sm hover-lift cursor-move border border-red-100" draggable="true">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-gray-700" data-bind="task.title">Client presentation</span>
+                                                <i class="fas fa-grip-dots-vertical text-gray-400"></i>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1" data-bind="task.deadline">Due: Tomorrow</div>
+                                        </div>
+                                    </div>
+                                    <!-- @END_MAP )) -->
+                                </div>
+                                
+                                <!-- Important, Not Urgent -->
+                                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 relative group hover:bg-yellow-100 transition-colors duration-300">
+                                    <div class="absolute top-4 left-4">
+                                        <h3 class="font-semibold text-yellow-700">Schedule</h3>
+                                        <p class="text-sm text-yellow-600">Important, Not Urgent</p>
+                                    </div>
+                                    
+                                    <div class="mt-16 space-y-3" data-drop-zone="important-not-urgent">
+                                        <div class="bg-white rounded-xl p-4 shadow-sm hover-lift cursor-move border border-yellow-100" draggable="true">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-gray-700" data-bind="task.title">Learn new skill</span>
+                                                <i class="fas fa-grip-dots-vertical text-gray-400"></i>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1" data-bind="task.deadline">This week</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Urgent, Not Important -->
+                                <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 relative group hover:bg-blue-100 transition-colors duration-300">
+                                    <div class="absolute top-4 left-4">
+                                        <h3 class="font-semibold text-blue-700">Delegate</h3>
+                                        <p class="text-sm text-blue-600">Urgent, Not Important</p>
+                                    </div>
+                                    
+                                    <div class="mt-16 space-y-3" data-drop-zone="urgent-not-important">
+                                        <div class="bg-white rounded-xl p-4 shadow-sm hover-lift cursor-move border border-blue-100" draggable="true">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-gray-700" data-bind="task.title">Team meeting</span>
+                                                <i class="fas fa-grip-dots-vertical text-gray-400"></i>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1" data-bind="task.deadline">Today 3PM</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Neither -->
+                                <div class="bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 relative group hover:bg-gray-100 transition-colors duration-300">
+                                    <div class="absolute top-4 left-4">
+                                        <h3 class="font-semibold text-gray-700">Eliminate</h3>
+                                        <p class="text-sm text-gray-600">Neither Urgent nor Important</p>
+                                    </div>
+                                    
+                                    <div class="mt-16 space-y-3" data-drop-zone="eliminate">
+                                        <div class="bg-white rounded-xl p-4 shadow-sm hover-lift cursor-move border border-gray-100" draggable="true">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-gray-700" data-bind="task.title">Social media</span>
+                                                <i class="fas fa-grip-dots-vertical text-gray-400"></i>
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1" data-bind="task.deadline">Minimize</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: EisenhowerMatrix -->
+                        
+                        <!-- Today's Schedule -->
+                        <!-- @COMPONENT: TodaySchedule [animated calendar view] -->
+                        <div class="glass-morphism rounded-3xl p-8 animate-fade-in">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold text-gray-800">Today's Schedule</h2>
+                                <div class="text-sm text-gray-500 font-mono" data-bind="currentDate">Wednesday, Nov 15</div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- @MAP: todaySchedule.map(event => ( -->
+                                <div class="flex items-center space-x-4 p-4 bg-white rounded-2xl hover-lift group stagger-animation animate-slide-up">
+                                    <div class="w-2 h-12 bg-gradient-to-b from-primary to-secondary rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="font-semibold text-gray-800" data-bind="event.title">Team Standup</h3>
+                                            <span class="text-sm text-gray-500" data-bind="event.duration">30 min</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600" data-bind="event.time">09:00 - 09:30</p>
+                                        <p class="text-xs text-gray-500" data-bind="event.location">Conference Room A</p>
+                                    </div>
+                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <i class="fas fa-external-link-alt text-gray-400 text-sm"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4 p-4 bg-white rounded-2xl hover-lift group stagger-animation animate-slide-up">
+                                    <div class="w-2 h-12 bg-gradient-to-b from-accent to-success rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="font-semibold text-gray-800" data-bind="event.title">Focus Session</h3>
+                                            <span class="text-sm text-gray-500" data-bind="event.duration">2 hours</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600" data-bind="event.time">10:00 - 12:00</p>
+                                        <p class="text-xs text-gray-500" data-bind="event.location">Monk Mode Active</p>
+                                    </div>
+                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <i class="fas fa-brain text-accent text-sm"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4 p-4 bg-white rounded-2xl hover-lift group stagger-animation animate-slide-up">
+                                    <div class="w-2 h-12 bg-gradient-to-b from-warning to-danger rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="font-semibold text-gray-800" data-bind="event.title">Workout Session</h3>
+                                            <span class="text-sm text-gray-500" data-bind="event.duration">45 min</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600" data-bind="event.time">17:00 - 17:45</p>
+                                        <p class="text-xs text-gray-500" data-bind="event.location">AI Guided Training</p>
+                                    </div>
+                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <i class="fas fa-dumbbell text-warning text-sm"></i>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: TodaySchedule -->
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="space-y-8">
+                        
+                        <!-- Monk Mode Timer -->
+                        <!-- @COMPONENT: MonkMode [focus timer with ambient animations] -->
+                        <div class="glass-morphism rounded-3xl p-8 text-center animate-fade-in">
+                            <div class="mb-6">
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">Monk Mode</h2>
+                                <p class="text-sm text-gray-600">Deep focus session</p>
+                            </div>
+                            
+                            <!-- Timer Circle -->
+                            <div class="relative w-48 h-48 mx-auto mb-6">
+                                <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 144 144">
+                                    <circle cx="72" cy="72" r="68" fill="none" stroke="#E5E7EB" stroke-width="8"/>
+                                    <circle cx="72" cy="72" r="68" fill="none" stroke="url(#gradient)" stroke-width="8" 
+                                            stroke-dasharray="427" stroke-dashoffset="107" class="progress-ring transition-all duration-1000"/>
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:#6366F1"/>
+                                            <stop offset="100%" style="stop-color:#8B5CF6"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <div class="text-3xl font-bold text-gray-800" data-bind="timer.minutes">25</div>
+                                        <div class="text-sm text-gray-500" data-bind="timer.seconds">:00</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Control Buttons -->
+                            <div class="flex items-center justify-center space-x-4">
+                                <button class="w-12 h-12 bg-primary text-white rounded-full hover:bg-primary/90 transition-all duration-300 hover:scale-110 animate-pulse-glow"
+                                        data-event="click:startTimer">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="w-12 h-12 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 transition-all duration-300 hover:scale-110"
+                                        data-event="click:pauseTimer">
+                                    <i class="fas fa-pause"></i>
+                                </button>
+                                <button class="w-12 h-12 bg-danger text-white rounded-full hover:bg-danger/90 transition-all duration-300 hover:scale-110"
+                                        data-event="click:resetTimer">
+                                    <i class="fas fa-stop"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Session Types -->
+                            <div class="mt-6 grid grid-cols-3 gap-2">
+                                <button class="px-3 py-2 text-xs rounded-xl bg-primary/10 text-primary font-medium hover:bg-primary hover:text-white transition-all duration-300">
+                                    25min
+                                </button>
+                                <button class="px-3 py-2 text-xs rounded-xl bg-gray-100 text-gray-600 hover:bg-accent hover:text-white transition-all duration-300">
+                                    15min
+                                </button>
+                                <button class="px-3 py-2 text-xs rounded-xl bg-gray-100 text-gray-600 hover:bg-success hover:text-white transition-all duration-300">
+                                    5min
+                                </button>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: MonkMode -->
+                        
+                        <!-- Wellness Dashboard -->
+                        <!-- @COMPONENT: WellnessDashboard [fitness and brain training metrics] -->
+                        <div class="glass-morphism rounded-3xl p-8 animate-fade-in">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6">Wellness Dashboard</h2>
+                            
+                            <!-- Fitness Tracking -->
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-sm font-medium text-gray-700">Daily Steps</span>
+                                    <span class="text-sm text-gray-500" data-bind="fitness.steps">8,247 / 10,000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-gradient-to-r from-success to-accent h-2 rounded-full transition-all duration-1000 ease-out" 
+                                         style="width: 82.47%" data-bind="fitness.stepsProgress"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Brain Training -->
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-sm font-medium text-gray-700">Brain Score</span>
+                                    <span class="text-sm text-gray-500" data-bind="brain.score">85%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-1000 ease-out" 
+                                         style="width: 85%" data-bind="brain.scoreProgress"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Actions -->
+                            <div class="space-y-3">
+                                <button class="w-full p-3 bg-gradient-to-r from-success to-accent text-white rounded-xl hover:scale-105 transition-transform duration-300 flex items-center justify-center space-x-2">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Start AI Workout</span>
+                                </button>
+                                
+                                <button class="w-full p-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:scale-105 transition-transform duration-300 flex items-center justify-center space-x-2">
+                                    <i class="fas fa-brain"></i>
+                                    <span>Brain Exercise</span>
+                                </button>
+                                
+                                <button class="w-full p-3 bg-gradient-to-r from-warning to-danger text-white rounded-xl hover:scale-105 transition-transform duration-300 flex items-center justify-center space-x-2">
+                                    <i class="fas fa-robot"></i>
+                                    <span>Configure Agents</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: WellnessDashboard -->
+                        
+                        <!-- AI Agents Panel -->
+                        <!-- @COMPONENT: AIAgents [N8N integration panel] -->
+                        <div class="glass-morphism rounded-3xl p-8 animate-fade-in">
+                            <h2 class="text-xl font-bold text-gray-800 mb-4">AI Agents</h2>
+                            <p class="text-sm text-gray-600 mb-6">Automated workflows via N8N integration</p>
+                            
+                            <div class="space-y-4">
+                                <!-- @MAP: aiAgents.map(agent => ( -->
+                                <div class="flex items-center justify-between p-3 bg-white rounded-xl hover-lift">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-envelope text-white text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-700" data-bind="agent.name">Email Assistant</div>
+                                            <div class="text-xs text-gray-500" data-bind="agent.status">Active</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-2 h-2 bg-success rounded-full animate-pulse"></span>
+                                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white rounded-xl hover-lift">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-gradient-to-r from-accent to-success rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-calendar text-white text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-700" data-bind="agent.name">Calendar Sync</div>
+                                            <div class="text-xs text-gray-500" data-bind="agent.status">Active</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-2 h-2 bg-success rounded-full animate-pulse"></span>
+                                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 bg-white rounded-xl hover-lift">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-gradient-to-r from-warning to-danger rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-clock text-white text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-700" data-bind="agent.name">Smart Scheduler</div>
+                                            <div class="text-xs text-gray-500" data-bind="agent.status">Inactive</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: AIAgents -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: Dashboard -->
+        
+        <!-- Feature Showcase -->
+        <!-- @COMPONENT: FeatureShowcase [animated feature highlights] -->
+        <section class="py-20 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">
+                        <span class="gradient-text">Next-Level</span> Features
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                        Discover the advanced capabilities that make ProFlow the ultimate productivity companion
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Feature Cards -->
+                    <!-- @MAP: features.map(feature => ( -->
+                    <div class="group relative overflow-hidden">
+                        <div class="animated-border">
+                            <div class="bg-white rounded-xl p-8 h-full hover-lift">
+                                <div class="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center mb-6 group-hover:animate-float">
+                                    <i class="fas fa-brain text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4" data-bind="feature.title">AI-Powered Focus</h3>
+                                <p class="text-gray-600 mb-6" data-bind="feature.description">
+                                    Advanced algorithms analyze your work patterns and optimize your focus sessions for maximum productivity.
+                                </p>
+                                <div class="flex items-center text-primary font-medium">
+                                    <span>Learn More</span>
+                                    <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="group relative overflow-hidden">
+                        <div class="animated-border">
+                            <div class="bg-white rounded-xl p-8 h-full hover-lift">
+                                <div class="w-16 h-16 bg-gradient-to-r from-success to-accent rounded-2xl flex items-center justify-center mb-6 group-hover:animate-float">
+                                    <i class="fas fa-dumbbell text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4" data-bind="feature.title">Smart Fitness Tracking</h3>
+                                <p class="text-gray-600 mb-6" data-bind="feature.description">
+                                    Real-time computer vision analysis guides your workouts and tracks your form with precision.
+                                </p>
+                                <div class="flex items-center text-primary font-medium">
+                                    <span>Learn More</span>
+                                    <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="group relative overflow-hidden">
+                        <div class="animated-border">
+                            <div class="bg-white rounded-xl p-8 h-full hover-lift">
+                                <div class="w-16 h-16 bg-gradient-to-r from-warning to-danger rounded-2xl flex items-center justify-center mb-6 group-hover:animate-float">
+                                    <i class="fas fa-robot text-white text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4" data-bind="feature.title">Workflow Automation</h3>
+                                <p class="text-gray-600 mb-6" data-bind="feature.description">
+                                    N8N-powered agents handle your routine tasks, from email management to calendar scheduling.
+                                </p>
+                                <div class="flex items-center text-primary font-medium">
+                                    <span>Learn More</span>
+                                    <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: FeatureShowcase -->
+    </main>
+    
+    <!-- Floating Action Button -->
+    <!-- @COMPONENT: FloatingActionButton [quick access to key functions] -->
+    <div class="fixed bottom-8 right-8 z-40">
+        <div class="relative">
+            <button class="w-16 h-16 bg-gradient-to-r from-primary to-secondary text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 animate-pulse-glow"
+                    data-event="click:toggleQuickActions">
+                <i class="fas fa-plus text-xl"></i>
+            </button>
+            
+            <!-- Quick Action Menu -->
+            <!-- @STATE: isQuickMenuOpen:boolean = false -->
+            <div class="absolute bottom-20 right-0 w-48 glass-morphism rounded-2xl p-4 space-y-2 opacity-0 scale-0 transition-all duration-300"
+                 data-bind="quickMenu.visibility">
+                <button class="w-full p-3 text-left hover:bg-white/20 rounded-xl transition-colors duration-300 text-white flex items-center space-x-3">
+                    <i class="fas fa-plus text-sm"></i>
+                    <span class="text-sm">Add Task</span>
+                </button>
+                <button class="w-full p-3 text-left hover:bg-white/20 rounded-xl transition-colors duration-300 text-white flex items-center space-x-3">
+                    <i class="fas fa-brain text-sm"></i>
+                    <span class="text-sm">Start Focus</span>
+                </button>
+                <button class="w-full p-3 text-left hover:bg-white/20 rounded-xl transition-colors duration-300 text-white flex items-center space-x-3">
+                    <i class="fas fa-dumbbell text-sm"></i>
+                    <span class="text-sm">Quick Workout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: FloatingActionButton -->
+    
+    <!-- Notification Toast -->
+    <!-- @COMPONENT: NotificationSystem [animated toast notifications] -->
+    <div class="fixed top-24 right-8 z-50 space-y-4" data-bind="notifications">
+        <!-- @MAP: notifications.map(notification => ( -->
+        <div class="glass-morphism rounded-2xl p-4 max-w-sm animate-slide-up shadow-2xl border border-white/20" data-mock="true">
+            <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-r from-success to-accent rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-check text-white text-sm"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white" data-bind="notification.title">Task Completed!</p>
+                    <p class="text-xs text-gray-200 mt-1" data-bind="notification.message">You finished "Fix critical bug" - Great work!</p>
+                </div>
+                <button class="text-gray-300 hover:text-white transition-colors duration-300">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+        </div>
+        <!-- @END_MAP )) -->
+    </div>
+    <!-- @END_COMPONENT: NotificationSystem -->
+
+    <script>
+        // IIFE to avoid global namespace pollution
+        (function() {
+            // TODO: Implement drag and drop functionality for Eisenhower Matrix
+            // TODO: Implement timer functionality for Monk Mode
+            // TODO: Implement real-time fitness tracking integration
+            // TODO: Implement notification system with proper state management
+            // TODO: Implement N8N workflow automation
+            // TODO: Implement brain exercise games
+            // TODO: Implement camera-based workout guidance
+            
+            // Animation initialization
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.animate-fade-in, .animate-slide-up, .animate-scale-in').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Hover effects for interactive elements
+            document.querySelectorAll('.hover-lift').forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.02)';
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+            
+            // Notification demo (for showcase purposes)
+            setTimeout(() => {
+                // Simulate a notification appearing
+                const notification = document.querySelector('[data-bind="notifications"] > div');
+                if (notification) {
+                    notification.style.display = 'block';
+                    notification.classList.add('animate-slide-up');
+                }
+            }, 2000);
+            
+        })();
+    </script>
+</body>
+</html>

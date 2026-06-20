@@ -61,6 +61,18 @@ export default {
       fontFamily: {
         sans: ["var(--font-sans)"],
       },
+      transformStyle: {
+        "3d": "preserve-3d",
+      },
+      transform3d: {
+        preserve: "preserve-3d",
+      },
+      rotate: {
+        "y-180": "rotateY(180deg)",
+      },
+      backfaceVisibility: {
+        hidden: "hidden",
+      },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "slide-up": "slideUp 0.6s ease-out",

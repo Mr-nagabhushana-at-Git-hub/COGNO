@@ -4,7 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Trophy, Target, Zap, Play } from "lucide-react";
+import { Brain, Trophy, Target, Zap, Play, Grid3X3, Palette } from "lucide-react";
+import DualNBack from "@/components/brain-games/dual-n-back";
+import StroopTest from "@/components/brain-games/stroop-test";
+import SchulteGrid from "@/components/brain-games/schulte-grid";
+import MemoryMatch from "@/components/brain-games/memory-match-game";
 import MemoryGame from "@/components/brain-games/memory-game";
 import LogicPuzzle from "@/components/brain-games/logic-puzzle";
 import type { BrainGameScore } from "@shared/schema";
@@ -17,6 +21,46 @@ export default function BrainTraining() {
   });
 
   const games = [
+    {
+      id: "dual-n-back",
+      title: "Dual N-Back",
+      description: "Working memory training with position and audio stimuli",
+      icon: Brain,
+      color: "bg-purple-500",
+      difficulty: "Medium",
+      estimatedTime: "5-10 min",
+      component: DualNBack
+    },
+    {
+      id: "stroop",
+      title: "Stroop Effect Test",
+      description: "Cognitive flexibility test with color-word interference",
+      icon: Palette,
+      color: "bg-pink-500",
+      difficulty: "Medium",
+      estimatedTime: "3-5 min",
+      component: StroopTest
+    },
+    {
+      id: "schulte",
+      title: "Schulte Table",
+      description: "Attention and peripheral vision training",
+      icon: Grid3X3,
+      color: "bg-emerald-500",
+      difficulty: "Easy",
+      estimatedTime: "2-3 min",
+      component: SchulteGrid
+    },
+    {
+      id: "memory-match",
+      title: "Memory Match",
+      description: "Match pairs of symbols with a classic card flip game",
+      icon: Brain,
+      color: "bg-indigo-500",
+      difficulty: "Easy",
+      estimatedTime: "5-10 min",
+      component: MemoryMatch
+    },
     {
       id: "memory",
       title: "Memory Challenge",
@@ -246,15 +290,26 @@ export default function BrainTraining() {
                     <div className={`w-8 h-8 ${
                       score.gameType === 'memory' ? 'bg-purple-100 text-purple-600' :
                       score.gameType === 'logic' ? 'bg-blue-100 text-blue-600' :
+                      score.gameType === 'dual-n-back' ? 'bg-purple-100 text-purple-600' :
+                      score.gameType === 'stroop' ? 'bg-pink-100 text-pink-600' :
+                      score.gameType === 'schulte' || score.gameType === 'memory-match' ? 'bg-emerald-100 text-emerald-600' :
                       'bg-green-100 text-green-600'
                     } rounded-lg flex items-center justify-center`}>
-                      {score.gameType === 'memory' ? <Brain className="h-4 w-4" /> :
+                      {score.gameType === 'memory' || score.gameType === 'dual-n-back' ? <Brain className="h-4 w-4" /> :
                        score.gameType === 'logic' ? <Target className="h-4 w-4" /> :
+                       score.gameType === 'stroop' ? <Palette className="h-4 w-4" /> :
+                       score.gameType === 'schulte' ? <Grid3X3 className="h-4 w-4" /> :
                        <Zap className="h-4 w-4" />}
                     </div>
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white capitalize">
-                        {score.gameType} Challenge
+                        {score.gameType === 'memory' ? 'Memory Challenge' :
+                         score.gameType === 'logic' ? 'Spatial Recall Matrix' :
+                         score.gameType === 'dual-n-back' ? 'Dual N-Back' :
+                         score.gameType === 'stroop' ? 'Stroop Effect Test' :
+                         score.gameType === 'schulte' ? 'Schulte Table' :
+                         score.gameType === 'memory-match' ? 'Memory Match' :
+                         score.gameType + ' Challenge'}
                       </p>
                       <p className="text-sm text-gray-500">
                         Level {score.level} • {new Date(score.createdAt).toLocaleDateString()}

@@ -55,7 +55,7 @@ export default function DualNBack({ onGameEnd }: DualNBackProps) {
     maxStreak: 0
   });
 
-const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
+  const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
   const [activePosition, setActivePosition] = useState<number | null>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -91,7 +91,7 @@ const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
     oscillator.stop(audioContextRef.current.currentTime + 0.3);
   }, []);
 
-  const generateTrials = useCallback((nLevel: number, count: number): Stimulus[] => {
+  const generateTrials = useCallback((count: number): Stimulus[] => {
     const trials: Stimulus[] = [];
     for (let i = 0; i < count; i++) {
       const position = Math.floor(Math.random() * (GRID_SIZE * GRID_SIZE));
@@ -102,7 +102,7 @@ const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
   }, []);
 
   const startGame = () => {
-    const trials = generateTrials(1, TOTAL_TRIALS);
+    const trials = generateTrials(TOTAL_TRIALS);
     setGameState({
       trials,
       currentTrial: 0,
@@ -240,20 +240,6 @@ const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
     });
     setGameStartTime(null);
     setActivePosition(null);
-  };
-
-  const getPositionMatches = () => {
-    if (gameState.currentTrial < gameState.nLevel) return false;
-    const current = gameState.trials[gameState.currentTrial];
-    const nBack = gameState.trials[gameState.currentTrial - gameState.nLevel];
-    return current.position === nBack.position;
-  };
-
-  const getAudioMatches = () => {
-    if (gameState.currentTrial < gameState.nLevel) return false;
-    const current = gameState.trials[gameState.currentTrial];
-    const nBack = gameState.trials[gameState.currentTrial - gameState.nLevel];
-    return current.letter === nBack.letter;
   };
 
   const accuracy = gameState.total > 0 ? Math.round((gameState.correct / gameState.total) * 100) : 0;

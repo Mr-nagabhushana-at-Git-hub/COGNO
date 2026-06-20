@@ -8,6 +8,7 @@ import Dashboard from "@/pages/dashboard";
 import Tasks from "@/pages/tasks";
 import BrainTraining from "@/pages/brain-training";
 import Fitness from "@/pages/fitness";
+import Wellness from "@/pages/wellness";
 import AppHeader from "@/components/layout/app-header";
 import Sidebar from "@/components/layout/sidebar";
 
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/tasks" component={Tasks} />
       <Route path="/brain-training" component={BrainTraining} />
       <Route path="/fitness" component={Fitness} />
+      <Route path="/wellness" component={Wellness} />
       <Route component={NotFound} />
     </Switch>
   );

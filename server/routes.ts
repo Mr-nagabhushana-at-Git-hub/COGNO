@@ -6,9 +6,11 @@ import {
   insertFocusSessionSchema, 
   insertBrainGameScoreSchema, 
   insertFitnessDataSchema,
-  insertNotificationSchema
+  insertNotificationSchema,
+  journalEntrySchema
 } from "@shared/schema";
 import { z } from "zod";
+import { analyzeJournal, buildCompanionReply, containsCrisisLanguage } from "./wellness-analysis";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const DEMO_USER_ID = "demo-user";
@@ -283,6 +285,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(analytics);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  app.get("/api/journals", async (_req, res) => {
+    try {
+      res.json(await storage.getJournals(DEMO_USER_ID));
+    } catch {
+      res.status(500).json({ error: "Failed to fetch journals" });
+    }
+  });
+
+  app.post("/api/journals", async (req, res) => {
+    try {
+      const { content } = journalEntrySchema.parse(req.body);
+      const analysis = analyzeJournal(content);
+      const journal = await storage.createJournal({
+        userId: DEMO_USER_ID,
+        content,
+        primaryEmotion: analysis.primaryEmotion,
+        intensityScore: analysis.intensityScore,
+        burnoutRisk: analysis.burnoutRisk,
+        crisisFlag: analysis.crisisFlag,
+        analysisSource: "local-safety-engine",
+      });
+      const triggers = await Promise.all(analysis.triggers.map((label) => storage.createStressTrigger({
+        userId: DEMO_USER_ID,
+        journalId: journal.id,
+        label,
+        intensity: analysis.intensityScore,
+      })));
+      res.status(201).json({ journal, triggers, crisisSupportRequired: analysis.crisisFlag });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid journal entry", details: error.errors });
+      } else {
+        res.status(500).json({ error: "Failed to save journal" });
+      }
+    }
+  });
+
+  app.get("/api/stress-triggers", async (req, res) => {
+    try {
+      const days = z.coerce.number().int().min(1).max(365).default(30).parse(req.query.days);
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+      res.json(await storage.getStressTriggers(DEMO_USER_ID, since));
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: "Invalid timeframe" });
+      else res.status(500).json({ error: "Failed to fetch stress triggers" });
+    }
+  });
+
+  app.post("/api/companion/chat", async (req, res) => {
+    try {
+      const { message } = z.object({ message: z.string().trim().min(1).max(2000) }).parse(req.body);
+      const recentTriggers = await storage.getStressTriggers(
+        DEMO_USER_ID,
+        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      );
+      const labels = Array.from(new Set(recentTriggers.map((trigger) => trigger.label)));
+      res.json({
+        reply: buildCompanionReply(message, labels),
+        crisisSupportRequired: containsCrisisLanguage(message),
+        source: "guided-local-companion",
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: "Invalid message", details: error.errors });
+      else res.status(500).json({ error: "Companion is temporarily unavailable" });
     }
   });
 

@@ -10,7 +10,11 @@ import {
   type FitnessData,
   type InsertFitnessData,
   type Notification,
-  type InsertNotification
+  type InsertNotification,
+  type Journal,
+  type InsertJournal,
+  type StressTrigger,
+  type InsertStressTrigger
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
@@ -50,6 +54,11 @@ export interface IStorage {
   getUnreadNotifications(userId: string): Promise<Notification[]>;
   createNotification(notification: InsertNotification): Promise<Notification>;
   markNotificationRead(id: string, userId: string): Promise<boolean>;
+
+  getJournals(userId: string): Promise<Journal[]>;
+  createJournal(journal: InsertJournal): Promise<Journal>;
+  getStressTriggers(userId: string, since?: Date): Promise<StressTrigger[]>;
+  createStressTrigger(trigger: InsertStressTrigger): Promise<StressTrigger>;
 }
 
 export class MemStorage implements IStorage {
@@ -59,6 +68,8 @@ export class MemStorage implements IStorage {
   private brainGameScores: Map<string, BrainGameScore> = new Map();
   private fitnessData: Map<string, FitnessData> = new Map();
   private notifications: Map<string, Notification> = new Map();
+  private journals: Map<string, Journal> = new Map();
+  private stressTriggers: Map<string, StressTrigger> = new Map();
 
   constructor() {
     // Create a demo user
@@ -259,6 +270,37 @@ export class MemStorage implements IStorage {
     notification.read = true;
     this.notifications.set(id, notification);
     return true;
+  }
+
+  async getJournals(userId: string): Promise<Journal[]> {
+    return Array.from(this.journals.values())
+      .filter((journal) => journal.userId === userId)
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+
+  async createJournal(insertJournal: InsertJournal): Promise<Journal> {
+    const journal: Journal = {
+      ...insertJournal,
+      id: randomUUID(),
+      burnoutRisk: insertJournal.burnoutRisk ?? false,
+      crisisFlag: insertJournal.crisisFlag ?? false,
+      analysisSource: insertJournal.analysisSource ?? "local-safety-engine",
+      createdAt: new Date(),
+    };
+    this.journals.set(journal.id, journal);
+    return journal;
+  }
+
+  async getStressTriggers(userId: string, since?: Date): Promise<StressTrigger[]> {
+    return Array.from(this.stressTriggers.values())
+      .filter((trigger) => trigger.userId === userId && (!since || trigger.createdAt! >= since))
+      .sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
+  }
+
+  async createStressTrigger(insertTrigger: InsertStressTrigger): Promise<StressTrigger> {
+    const trigger: StressTrigger = { ...insertTrigger, id: randomUUID(), createdAt: new Date() };
+    this.stressTriggers.set(trigger.id, trigger);
+    return trigger;
   }
 }
 

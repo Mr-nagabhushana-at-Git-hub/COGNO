@@ -3,21 +3,17 @@ import { cn } from "@/lib/utils";
 import { 
   Home, 
   CheckSquare, 
-  Calendar, 
   Brain, 
   Dumbbell, 
-  Bot, 
-  BarChart3 
+  HeartHandshake
 } from "lucide-react";
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Tasks & Matrix', href: '/tasks', icon: CheckSquare },
-  { name: 'Calendar', href: '/calendar', icon: Calendar },
+  { name: 'Mental Wellness', href: '/wellness', icon: HeartHandshake },
   { name: 'Brain Training', href: '/brain-training', icon: Brain },
   { name: 'Fitness Tracker', href: '/fitness', icon: Dumbbell },
-  { name: 'AI Agents', href: '/agents', icon: Bot },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
 ];
 
 export default function Sidebar() {

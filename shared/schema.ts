@@ -68,6 +68,27 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+export const journals = pgTable("journals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  content: text("content").notNull(),
+  primaryEmotion: text("primary_emotion").notNull(),
+  intensityScore: integer("intensity_score").notNull(),
+  burnoutRisk: boolean("burnout_risk").default(false),
+  crisisFlag: boolean("crisis_flag").default(false),
+  analysisSource: text("analysis_source").default("local-safety-engine"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const stressTriggers = pgTable("stress_triggers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  journalId: varchar("journal_id").references(() => journals.id).notNull(),
+  label: text("label").notNull(),
+  intensity: integer("intensity").notNull(),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -99,6 +120,20 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
   createdAt: true
 });
 
+export const insertJournalSchema = createInsertSchema(journals).omit({
+  id: true,
+  createdAt: true
+});
+
+export const insertStressTriggerSchema = createInsertSchema(stressTriggers).omit({
+  id: true,
+  createdAt: true
+});
+
+export const journalEntrySchema = z.object({
+  content: z.string().trim().min(10, "Write at least 10 characters so the entry can be understood.").max(5000)
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -112,3 +147,7 @@ export type FitnessData = typeof fitnessData.$inferSelect;
 export type InsertFitnessData = z.infer<typeof insertFitnessDataSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Journal = typeof journals.$inferSelect;
+export type InsertJournal = z.infer<typeof insertJournalSchema>;
+export type StressTrigger = typeof stressTriggers.$inferSelect;
+export type InsertStressTrigger = z.infer<typeof insertStressTriggerSchema>;

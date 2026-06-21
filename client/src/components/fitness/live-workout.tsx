@@ -8,12 +8,15 @@ import { Camera, Activity, Target, Brain, ArrowLeft } from "lucide-react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
-// @ts-ignore
-import { Pose, POSE_CONNECTIONS } from "@mediapipe/pose";
-// @ts-ignore
-import { Camera as MediaPipeCamera } from "@mediapipe/camera_utils";
-// @ts-ignore
-import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
+import * as mpPose from "@mediapipe/pose";
+import * as mpCamera from "@mediapipe/camera_utils";
+import * as mpDrawing from "@mediapipe/drawing_utils";
+
+const Pose = mpPose.Pose || (window as any).Pose || (mpPose as any).default?.Pose;
+const POSE_CONNECTIONS = mpPose.POSE_CONNECTIONS || (window as any).POSE_CONNECTIONS || (mpPose as any).default?.POSE_CONNECTIONS;
+const MediaPipeCamera = mpCamera.Camera || (window as any).Camera || (mpCamera as any).default?.Camera;
+const drawConnectors = mpDrawing.drawConnectors || (window as any).drawConnectors || (mpDrawing as any).default?.drawConnectors;
+const drawLandmarks = mpDrawing.drawLandmarks || (window as any).drawLandmarks || (mpDrawing as any).default?.drawLandmarks;
 
 interface LiveWorkoutProps {
   workoutType: string;

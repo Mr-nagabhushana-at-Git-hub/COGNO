@@ -9,8 +9,10 @@ import {
   insertNotificationSchema,
   journalEntrySchema,
   insertDiseasePredictionSchema,
-  updateUserSettingsSchema
+  updateUserSettingsSchema,
+  insertJournalSchema
 } from "@shared/schema";
+import { SYMPTOM_CATEGORIES, ALL_SYMPTOMS, formatSymptom, predictRequestSchema, predictWithFallback } from "./ai/disease-predictor";
 import type { DiseasePrediction } from "@shared/schema";
 import { z } from "zod";
 import { createCrisisResponse, detectCrisis } from "./ai/crisis-router";
@@ -1174,7 +1176,7 @@ Use this multi-dimensional data to empathize deeply with the user.`;
     }
   });
 
-  app.get("/api/wellness/analytics", async (_req, res) => {
+  app.get("/api/wellness/analytics", async (req, res) => {
     try {
       const journals = await storage.getJournals(getUserId(req));
       const triggers = await storage.getStressTriggers(getUserId(req), new Date(Date.now() - 30 * 86400000));
@@ -1194,8 +1196,33 @@ Use this multi-dimensional data to empathize deeply with the user.`;
     }
   });
 
+  // ─── Health Predict Routes ───
+  app.get("/api/health-predict/symptoms", (_req, res) => {
+    try {
+      const categories = Object.entries(SYMPTOM_CATEGORIES).map(([category, symptomIds]) => ({
+        category,
+        symptoms: symptomIds.map(id => ({ id, label: formatSymptom(id) }))
+      }));
+      res.json({ categories, totalSymptoms: ALL_SYMPTOMS.length });
+    } catch (e) {
+      logFailure("ENGINE", "health_symptoms_failed", e);
+      res.status(500).json({ error: "Failed to load symptoms" });
+    }
+  });
+
+  app.post("/api/health-predict/predict", async (req, res) => {
+    try {
+      const { symptoms, patientDetails } = predictRequestSchema.parse(req.body);
+      const prediction = await predictWithFallback(symptoms, patientDetails);
+      res.json(prediction);
+    } catch (e) {
+      logFailure("ENGINE", "health_predict_failed", e);
+      res.status(400).json({ error: "Prediction failed" });
+    }
+  });
+
   // ─── Task Matrix Routes ───
-  app.get("/api/tasks", async (_req, res) => {
+  app.get("/api/tasks", async (req, res) => {
     try {
       const tasks = await storage.getTasks(getUserId(req));
       res.json(tasks);

@@ -1340,6 +1340,17 @@ Use this multi-dimensional data to empathize deeply with the user.`;
     }
   });
 
+  app.patch("/api/users/settings", async (req, res) => {
+    try {
+      const { geminiKey, groqKey } = req.body;
+      const user = await storage.updateUserSettings(getUserId(req), { geminiKey, groqKey });
+      res.json(user);
+    } catch (e) {
+      logFailure("ENGINE", "settings_save_failed", e);
+      res.status(500).json({ error: "Failed to save settings" });
+    }
+  });
+
   app.delete("/api/users/data", async (req, res) => {
     await storage.clearUserData(getUserId(req));
     res.json({ success: true });

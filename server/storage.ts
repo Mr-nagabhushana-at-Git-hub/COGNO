@@ -252,7 +252,15 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id, createdAt: new Date() };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt: new Date(),
+      geminiKey: insertUser.geminiKey ?? null,
+      groqKey: insertUser.groqKey ?? null,
+      googleFitAccessToken: insertUser.googleFitAccessToken ?? null,
+      googleFitRefreshToken: insertUser.googleFitRefreshToken ?? null
+    };
     this.users.set(user.id, user);
     return user;
   }

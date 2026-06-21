@@ -53,13 +53,13 @@ export default function Fitness() {
   const dailyGoals = { steps: 10000, exerciseMinutes: 45, calories: 500 };
 
   // Bio-Profile Engine
-  const { data: profileData } = useQuery({
+  const { data: profileData } = useQuery<any>({
     queryKey: ["/api/fitness/profile"],
     enabled: syncState === 'synced',
   });
 
   // Live Update Engine (Current Day) - Auto polls every 30 seconds once synced
-  const { data: liveData } = useQuery({
+  const { data: liveData } = useQuery<any>({
     queryKey: ["/api/fitness/sync/live"],
     enabled: syncState === 'synced',
     refetchInterval: 30000, // Live updates every 30s
@@ -226,7 +226,7 @@ export default function Fitness() {
                       endAngle={-270}
                     >
                       <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-                      <RadialBar background clockWise dataKey="value" cornerRadius={10} />
+                      <RadialBar background dataKey="value" cornerRadius={10} />
                     </RadialBarChart>
                   </ResponsiveContainer>
                 </div>

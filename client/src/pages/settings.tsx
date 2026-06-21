@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { Save, Key, Activity, CheckCircle, Database, Trash2, ExternalLink } from "lucide-react";
 
 export default function Settings() {
@@ -38,11 +39,9 @@ export default function Settings() {
   const saveAiKeys = async () => {
     setIsSaving(true);
     try {
-      const deviceId = localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user";
-      const response = await fetch("/api/users/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "X-Device-Id": deviceId },
-        body: JSON.stringify({ geminiKey: geminiKey || undefined, groqKey: groqKey || undefined }),
+      const response = await apiRequest("PATCH", "/api/users/settings", {
+        geminiKey: geminiKey || undefined, 
+        groqKey: groqKey || undefined
       });
       if (!response.ok) throw new Error("Failed to save keys");
       toast({
@@ -81,8 +80,7 @@ export default function Settings() {
     
     setIsSaving(true);
     try {
-      const deviceId = localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user";
-      const response = await fetch("/api/users/data", { method: "DELETE", headers: { "X-Device-Id": deviceId } });
+      const response = await apiRequest("DELETE", "/api/users/data");
       if (!response.ok) throw new Error("Failed to clear data");
       
       // Clear the local device ID to get a fresh start

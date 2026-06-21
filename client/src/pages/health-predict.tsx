@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Stars, Float, Sparkles as DreiSparkles } from "@react-three/drei";
 import * as THREE from "three";
@@ -139,15 +140,7 @@ export default function HealthPredict() {
 
   const predictMutation = useMutation<PredictionResponse, Error, string[]>({
     mutationFn: async (symptoms) => {
-      const res = await fetch("/api/health-predict/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symptoms }),
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Prediction failed");
-      }
+      const res = await apiRequest("POST", "/api/health-predict/predict", { symptoms });
       return res.json();
     },
     onSuccess: () => {

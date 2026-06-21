@@ -32,7 +32,7 @@ export async function apiRequest(
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "omit",
+    credentials: "same-origin",
   });
 
   await throwIfResNotOk(res);
@@ -47,7 +47,7 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const res = await fetch(queryKey.join("/") as string, {
       headers: { "X-Device-Id": getDeviceId() },
-      credentials: "omit",
+      credentials: "same-origin",
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

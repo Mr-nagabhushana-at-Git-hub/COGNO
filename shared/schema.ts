@@ -109,6 +109,8 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
   id: true,
   createdAt: true,
   updatedAt: true
+}).extend({
+  dueDate: z.coerce.date().nullable().optional()
 });
 
 export const insertFocusSessionSchema = createInsertSchema(focusSessions).omit({

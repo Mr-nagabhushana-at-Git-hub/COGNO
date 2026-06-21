@@ -186,36 +186,39 @@ export default function Wellness() {
   };
 
   const renderCompanionReply = (text: string) => {
-    const ytRegex = /\[YT:([a-zA-Z0-9_-]{11})\]/;
+    const ytRegex = /\[YT:\s*([a-zA-Z0-9_-]{11})\s*\]/i;
     const match = ytRegex.exec(text);
     if (match) {
       const videoId = match[1];
       const cleanText = text.replace(match[0], "").trim();
       return (
-        <div className="mt-4 flex flex-col gap-2">
-          {!isMonkModeActive ? (
-            <div className="rounded-xl overflow-hidden shadow-lg border border-emerald-500/30 aspect-video relative">
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                title="YouTube Integration"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-          ) : (
-            <div className="rounded-xl flex items-center justify-center shadow-lg border border-purple-500/30 aspect-video bg-black/80">
-              <p className="text-purple-400 font-bold tracking-widest uppercase">Blocked by Monk Mode</p>
-            </div>
-          )}
-          <a
-            href={`https://www.youtube.com/watch?v=${videoId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center w-full py-3 bg-red-600/90 hover:bg-red-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all"
-          >
-            Watch Fullscreen on YouTube
-          </a>
+        <div className="flex flex-col gap-4">
+          <div>{cleanText}</div>
+          <div className="mt-2 flex flex-col gap-2">
+            {!isMonkModeActive ? (
+              <div className="rounded-xl overflow-hidden shadow-lg border border-emerald-500/30 aspect-video relative">
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                  title="YouTube Integration"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            ) : (
+              <div className="rounded-xl flex items-center justify-center shadow-lg border border-purple-500/30 aspect-video bg-black/80">
+                <p className="text-purple-400 font-bold tracking-widest uppercase">Blocked by Monk Mode</p>
+              </div>
+            )}
+            <a
+              href={`https://www.youtube.com/watch?v=${videoId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-full py-3 bg-red-600/90 hover:bg-red-500 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all"
+            >
+              Watch Fullscreen on YouTube
+            </a>
+          </div>
         </div>
       );
     }

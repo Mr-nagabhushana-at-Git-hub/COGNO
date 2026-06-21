@@ -258,7 +258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const protocol = req.headers["x-forwarded-proto"] || req.protocol;
     const host = req.headers.host;
     const redirectUri = `${protocol}://${host}/api/auth/google/callback`;
-    const scope = "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly https://www.googleapis.com/auth/googlehealth.profile.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/user.birthday.read";
+    const scope = "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly https://www.googleapis.com/auth/googlehealth.profile.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/user.birthday.read https://www.googleapis.com/auth/calendar.events";
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline&prompt=consent`;
     res.json({ url: authUrl });
   });
@@ -1142,8 +1142,8 @@ Use this multi-dimensional data to empathize deeply with the user.`;
 
   app.post("/api/tasks", async (req, res) => {
     try {
-      const taskData = insertTaskSchema.parse(req.body);
-      const task = await storage.createTask({ ...taskData, userId: getUserId(req) });
+      const taskData = insertTaskSchema.parse({ ...req.body, userId: getUserId(req) });
+      const task = await storage.createTask(taskData);
       res.status(201).json(task);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -1184,6 +1184,55 @@ Use this multi-dimensional data to empathize deeply with the user.`;
     }
   });
 
+  app.post("/api/tasks/:id/sync-calendar", async (req, res) => {
+    try {
+      const user = await storage.getUser(getUserId(req));
+      if (!user?.googleFitAccessToken) {
+        return res.status(401).json({ error: "Google account not connected" });
+      }
+
+      // If mock token, just return success for demo users
+      if (user.googleFitAccessToken === "mock_access_token") {
+        return res.json({ success: true, message: "Mock synced to calendar" });
+      }
+
+      const taskId = req.params.id;
+      const tasks = await storage.getTasks(getUserId(req));
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return res.status(404).json({ error: "Task not found" });
+
+      const startTime = task.dueDate ? new Date(task.dueDate) : new Date();
+      const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour duration
+
+      const event = {
+        summary: `FocusFlow Task: ${task.title}`,
+        description: task.description || "Synced from FocusFlow Eisenhower Matrix",
+        start: { dateTime: startTime.toISOString() },
+        end: { dateTime: endTime.toISOString() },
+      };
+
+      const calRes = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${user.googleFitAccessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(event)
+      });
+
+      if (!calRes.ok) {
+        const errorText = await calRes.text();
+        logFailure("SYNC", "calendar_sync_failed_google_api", new Error(errorText));
+        throw new Error("Google Calendar API rejected the request. Please reconnect your Google Account in Settings to refresh permissions.");
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      logFailure("SYNC", "calendar_sync_failed", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to sync to calendar" });
+    }
+  });
+
   app.get("/api/tasks/category/:category", async (req, res) => {
     try {
       const category = req.params.category;
@@ -1212,6 +1261,26 @@ Use this multi-dimensional data to empathize deeply with the user.`;
   app.patch("/api/users/settings", async (req, res) => {
     try {
       const { geminiKey, groqKey } = req.body;
+
+      if (geminiKey) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+        const testRes = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: "hi" }] }] })
+        });
+        if (!testRes.ok) return res.status(400).json({ error: "Invalid Gemini API Key" });
+      }
+
+      if (groqKey) {
+        const testRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
+          body: JSON.stringify({ model: "llama3-8b-8192", messages: [{ role: "user", content: "hi" }], max_tokens: 5 })
+        });
+        if (!testRes.ok) return res.status(400).json({ error: "Invalid Groq API Key" });
+      }
+
       const user = await storage.updateUserSettings(getUserId(req), { geminiKey, groqKey });
       if (!user) return res.status(404).json({ error: "User not found" });
       res.json(user);

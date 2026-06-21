@@ -266,8 +266,21 @@ export class MemStorage implements IStorage {
   }
 
   async updateUserSettings(id: string, settings: Partial<User>): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (!user) return undefined;
+    let user = this.users.get(id);
+    if (!user) {
+      user = {
+        id,
+        username: `user_${id.substring(0, 8)}`,
+        email: `${id.substring(0, 8)}@local.dev`,
+        password: "auto",
+        geminiKey: null,
+        groqKey: null,
+        googleFitAccessToken: null,
+        googleFitRefreshToken: null,
+        createdAt: new Date(),
+      };
+      this.users.set(id, user);
+    }
     const updatedUser = { 
       ...user, 
       ...settings,

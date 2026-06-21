@@ -39,19 +39,25 @@ export default function Settings() {
   const saveAiKeys = async () => {
     setIsSaving(true);
     try {
-      const response = await apiRequest("PATCH", "/api/users/settings", {
+      await apiRequest("PATCH", "/api/users/settings", {
         geminiKey: geminiKey || undefined, 
         groqKey: groqKey || undefined
       });
-      if (!response.ok) throw new Error("Failed to save keys");
       toast({
-        title: "Configuration Saved",
-        description: "Your AI models have been updated successfully.",
+        title: "Configuration Validated & Saved",
+        description: "Your AI keys have been verified and successfully updated.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      let errorMessage = "Could not save AI settings. Please check your keys.";
+      try {
+        const parsed = JSON.parse(error.message.split(": ")[1]);
+        if (parsed.error) errorMessage = parsed.error;
+      } catch (e) {
+        if (error.message) errorMessage = error.message;
+      }
       toast({
-        title: "Error",
-        description: "Could not save AI settings.",
+        title: "Validation Error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

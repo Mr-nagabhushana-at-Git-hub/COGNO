@@ -118,6 +118,31 @@ export function useTasks() {
     return toggleTaskMutation.mutateAsync(id);
   };
 
+  // Sync to Google Calendar mutation
+  const syncTaskToCalendarMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest('POST', `/api/tasks/${id}/sync-calendar`);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Synced Successfully",
+        description: data.message || "Task synced to Google Calendar.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Sync Failed",
+        description: error.message || "Could not sync to Google Calendar. Make sure your Google Account is connected in Settings.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const syncTaskToCalendar = (id: string) => {
+    syncTaskToCalendarMutation.mutate(id);
+  };
+
   // Get tasks by category
   const getTasksByCategory = (category: string) => {
     return tasks?.filter(task => task.category === category) || [];
@@ -187,6 +212,8 @@ export function useTasks() {
     getHighPriorityTasks,
     getOverdueTasks,
     getTasksDueToday,
+    syncTaskToCalendar,
+    syncTaskToCalendarMutation,
   };
 }
 
@@ -198,7 +225,9 @@ export function useTasksByCategory(category: string) {
     queryKey: ["/api/tasks/category", category],
     queryFn: async () => {
       const response = await fetch(`/api/tasks/category/${category}`, {
-        credentials: "include",
+        headers: { 
+          "X-Device-Id": localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user"
+        },
       });
       if (!response.ok) {
         throw new Error(`Failed to fetch tasks for category: ${category}`);
@@ -215,7 +244,9 @@ export function useTask(id: string) {
     queryKey: ["/api/tasks", id],
     queryFn: async () => {
       const response = await fetch(`/api/tasks/${id}`, {
-        credentials: "include",
+        headers: { 
+          "X-Device-Id": localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user"
+        },
       });
       if (!response.ok) {
         throw new Error(`Failed to fetch task: ${id}`);

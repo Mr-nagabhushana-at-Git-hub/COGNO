@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { 
   Plus, Target, Flame, Sparkles, CheckCircle2, 
-  Circle, AlertCircle, Clock, Trash2 
+  Circle, AlertCircle, Clock, Trash2, CalendarPlus, Loader2
 } from "lucide-react";
 import type { Task } from "@shared/schema";
 import { useTasks } from "@/hooks/use-tasks";
@@ -59,7 +59,7 @@ const quadrants = [
 export default function TasksGraph() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [quickTask, setQuickTask] = useState("");
-  const { tasks, isLoading, toggleTask, deleteTask, createTask, getTaskStats } = useTasks();
+  const { tasks, isLoading, toggleTask, deleteTask, createTask, getTaskStats, syncTaskToCalendar, syncTaskToCalendarMutation } = useTasks();
   
   const stats = getTaskStats();
 
@@ -229,12 +229,23 @@ export default function TasksGraph() {
                           </div>
                         </div>
 
-                        <button 
-                          onClick={() => deleteTask(task.id)}
-                          className="shrink-0 text-muted-foreground/50 hover:text-red-400 transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button 
+                            onClick={() => syncTaskToCalendar(task.id)}
+                            disabled={syncTaskToCalendarMutation.isPending}
+                            className="text-muted-foreground/50 hover:text-indigo-400 transition-colors disabled:opacity-50"
+                            title="Sync to Google Calendar"
+                          >
+                            {syncTaskToCalendarMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarPlus className="h-4 w-4" />}
+                          </button>
+                          <button 
+                            onClick={() => deleteTask(task.id)}
+                            className="text-muted-foreground/50 hover:text-red-400 transition-colors"
+                            title="Delete Task"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </motion.div>
                   ))}

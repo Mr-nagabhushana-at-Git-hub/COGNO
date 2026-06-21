@@ -26,7 +26,7 @@ function contextPrompt(context: CompanionContext): string {
 - [YT:M7lc1UVf-VE] (5-Minute Calming Meditation)
 - [YT:dQw4w9WgXcQ] (Short Motivational Speech)
   `;
-  return `Recent journal analyses: ${summaries || "none"}.${metricsInfo} User message: ${context.message}. Give a short, empathetic, non-diagnostic coping response with one concrete next step. Never claim to be emergency support. Consider their holistic state (tasks, fitness, focus) if relevant to their stress or well-being, but maintain an emotionally supportive tone. If you believe a specific calming, motivational, or focus-oriented YouTube video would help them right now, output the exact string [YT:video_id] but YOU MUST STRICTLY CHOOSE ONE from this exact list: ${ytLibrary}. DO NOT invent or guess YouTube IDs.`;
+  return `Recent journal analyses: ${summaries || "none"}.${metricsInfo} User message: ${context.message}. Give a short, empathetic, non-diagnostic coping response with one concrete next step. Never claim to be emergency support. Consider their holistic state (tasks, fitness, focus) if relevant to their stress or well-being, but maintain an emotionally supportive tone. YOU MUST always include exactly one YouTube video from this specific list to help them cope or relax. Output the exact string [YT:video_id]. YOU MUST STRICTLY CHOOSE ONE from this exact list: ${ytLibrary}. DO NOT invent or guess YouTube IDs.`;
 }
 
 async function requestJson(url: string, init: RequestInit, timeoutMs: number): Promise<unknown> {
@@ -135,12 +135,13 @@ export class HuggingFaceProvider extends RemoteProvider {
 
 export class GeminiProvider extends RemoteProvider {
   readonly name = "gemini";
-  readonly configured = Boolean(process.env.GEMINI_API_KEY);
+  readonly configured = false; // Requires user-provided key
   
   async complete(prompt: string, apiKeyOverride?: string): Promise<string> {
-    const apiKey = apiKeyOverride || process.env.GEMINI_API_KEY!;
-    // Using gemini-1.5-pro-latest since the prompt needs high reasoning capabilities
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`;
+    const apiKey = apiKeyOverride;
+    if (!apiKey) throw new Error("Gemini API key is required from user settings");
+    // Using gemini-2.5-flash since it works with the free tier and is very fast
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
     const body = await requestJson(url, {
       method: "POST",
@@ -163,10 +164,11 @@ export class GeminiProvider extends RemoteProvider {
 
 export class GroqProvider extends RemoteProvider {
   readonly name = "groq";
-  readonly configured = Boolean(process.env.GROQ_API_KEY);
+  readonly configured = false; // Requires user-provided key
   
   async complete(prompt: string, apiKeyOverride?: string): Promise<string> {
-    const apiKey = apiKeyOverride || process.env.GROQ_API_KEY!;
+    const apiKey = apiKeyOverride;
+    if (!apiKey) throw new Error("Groq API key is required from user settings");
     const body = await requestJson("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },

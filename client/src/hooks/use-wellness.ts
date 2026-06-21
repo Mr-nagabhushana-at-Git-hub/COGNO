@@ -93,7 +93,10 @@ export function useStreamingCompanion() {
     try {
       const response = await fetch("/api/companion/chat/stream", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "X-Device-Id": localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user"
+        },
         body: JSON.stringify({ message, ignoredTriggers }),
         signal: controller.signal,
       });

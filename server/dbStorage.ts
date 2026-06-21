@@ -37,6 +37,17 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserSettings(id: string, settings: Partial<User>): Promise<User | undefined> {
     const [user] = await db.update(users).set(settings).where(eq(users.id, id)).returning();
+    if (!user) {
+      const randomSuffix = Math.floor(Math.random() * 1000);
+      const [newUser] = await db.insert(users).values({
+        id,
+        username: `user_${id.substring(0, 8)}_${randomSuffix}`,
+        email: `${id.substring(0, 8)}_${randomSuffix}@local.dev`,
+        password: "auto",
+        ...settings
+      }).returning();
+      return newUser;
+    }
     return user;
   }
 

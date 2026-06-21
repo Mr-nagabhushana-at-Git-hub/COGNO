@@ -238,7 +238,9 @@ export function useFocusSessionAnalytics() {
     queryKey: ["/api/focus-sessions/analytics"],
     queryFn: async () => {
       const response = await fetch("/api/focus-sessions", {
-        credentials: "include",
+        headers: {
+          "X-Device-Id": localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user"
+        },
       });
       if (!response.ok) {
         throw new Error("Failed to fetch focus session analytics");

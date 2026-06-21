@@ -228,7 +228,11 @@ export class MemStorage implements IStorage {
       username: "alex.johnson",
       email: "alex@example.com",
       password: "password123",
-      createdAt: new Date()
+      geminiKey: null,
+      groqKey: null,
+      googleFitAccessToken: null,
+      googleFitRefreshToken: null,
+      createdAt: new Date(),
     };
     this.users.set(demoUser.id, demoUser);
   }
@@ -256,9 +260,16 @@ export class MemStorage implements IStorage {
   async updateUserSettings(id: string, settings: Partial<User>): Promise<User | undefined> {
     const user = this.users.get(id);
     if (!user) return undefined;
-    const updated = { ...user, ...settings };
-    this.users.set(id, updated);
-    return updated;
+    const updatedUser = { 
+      ...user, 
+      ...settings,
+      geminiKey: settings.geminiKey !== undefined ? settings.geminiKey : user.geminiKey,
+      groqKey: settings.groqKey !== undefined ? settings.groqKey : user.groqKey,
+      googleFitAccessToken: settings.googleFitAccessToken !== undefined ? settings.googleFitAccessToken : user.googleFitAccessToken,
+      googleFitRefreshToken: settings.googleFitRefreshToken !== undefined ? settings.googleFitRefreshToken : user.googleFitRefreshToken
+    };
+    this.users.set(id, updatedUser as User);
+    return updatedUser as User;
   }
 
   // Task methods
@@ -376,7 +387,7 @@ export class MemStorage implements IStorage {
 
   // Fitness methods
   async clearFitnessData(userId: string): Promise<void> {
-    for (const [id, data] of this.fitnessData.entries()) {
+    for (const [id, data] of Array.from(this.fitnessData.entries())) {
       if (data.userId === userId) {
         this.fitnessData.delete(id);
       }

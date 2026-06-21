@@ -19,7 +19,6 @@ import { createCrisisResponse, detectCrisis } from "./ai/crisis-router";
 import { logEvent, logFailure } from "./ai/logger";
 import { wellnessOrchestrator } from "./ai/orchestrator";
 import type { JournalAnalysis } from "@shared/wellness";
-import { ALL_SYMPTOMS, SYMPTOM_CATEGORIES, formatSymptom, predictWithFallback, predictRequestSchema } from "./ai/disease-predictor";
 
 interface DiseaseProfile {
   disease: string;
@@ -341,9 +340,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId: getUserId(req),
           date,
           steps: Math.floor(Math.random() * 4000) + 4000,
-          activeMinutes: Math.floor(Math.random() * 30) + 20,
+          exerciseMinutes: Math.floor(Math.random() * 30) + 20,
           caloriesBurned: Math.floor(Math.random() * 500) + 1500,
-          source: "google-fit-mock",
         });
         return res.json({ success: true, data });
       }
@@ -386,8 +384,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: getUserId(req),
         date: new Date(),
         steps,
-        activeMinutes: Math.floor(steps / 100),
-        source: "google-fit-live"
+        exerciseMinutes: Math.floor(steps / 100),
+
       });
 
       res.json({ success: true, data });
@@ -423,9 +421,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userId: getUserId(req),
             date: bDate,
             steps: finalSteps,
-            activeMinutes: Math.floor(finalSteps / 100),
+            exerciseMinutes: Math.floor(finalSteps / 100),
             caloriesBurned: Math.floor(finalSteps * 0.04),
-            source: "google-fit-mock",
+    
           }));
         }
         
@@ -506,8 +504,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId: getUserId(req),
           date: new Date(dateStr),
           steps,
-          activeMinutes: Math.floor(steps / 100),
-          source: "google-health"
+          exerciseMinutes: Math.floor(steps / 100),
+  
         }));
       }
 
@@ -537,9 +535,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId: getUserId(req),
           date: bDate,
           steps: finalSteps,
-          activeMinutes: Math.floor(finalSteps / 100),
+          exerciseMinutes: Math.floor(finalSteps / 100),
           caloriesBurned: Math.floor(finalSteps * 0.04),
-          source: "google-health-mock-fallback",
+  
         }));
       }
       

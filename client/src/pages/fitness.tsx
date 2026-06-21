@@ -256,7 +256,7 @@ export default function Fitness() {
                       endAngle={-270}
                     >
                       <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-                      <RadialBar background clockWise dataKey="value" cornerRadius={10} />
+                      <RadialBar background dataKey="value" cornerRadius={10} />
                     </RadialBarChart>
                   </ResponsiveContainer>
                 </div>
@@ -286,7 +286,7 @@ export default function Fitness() {
                       endAngle={-270}
                     >
                       <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-                      <RadialBar background clockWise dataKey="value" cornerRadius={10} />
+                      <RadialBar background dataKey="value" cornerRadius={10} />
                     </RadialBarChart>
                   </ResponsiveContainer>
                 </div>

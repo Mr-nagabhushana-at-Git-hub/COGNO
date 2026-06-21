@@ -71,7 +71,6 @@ export default function TasksGraph() {
       title: quickTask,
       category: "not-important-not-urgent", // Default landing zone
       priority: 1,
-      duration: 30,
     });
     setQuickTask("");
   };

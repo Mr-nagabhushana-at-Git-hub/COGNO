@@ -110,6 +110,24 @@ export default function Wellness() {
   const [crisisSupportRequired, setCrisisSupportRequired] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [ignoredTriggers, setIgnoredTriggers] = useState<string[]>([]);
+  const [isMonkModeActive, setIsMonkModeActive] = useState(false);
+
+  useEffect(() => {
+    const handleStart = () => setIsMonkModeActive(true);
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.source === "FOCUS_FLOW_APP" && e.data?.type === "STOP_MONK_MODE") {
+        setIsMonkModeActive(false);
+      }
+    };
+    
+    window.addEventListener("monk-mode-start", handleStart);
+    window.addEventListener("message", handleMessage);
+    
+    return () => {
+      window.removeEventListener("monk-mode-start", handleStart);
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
   const journals = useJournals();
   const triggers = useStressTriggers();
   const createJournal = useCreateJournal();
@@ -174,17 +192,22 @@ export default function Wellness() {
       const videoId = match[1];
       const cleanText = text.replace(match[0], "").trim();
       return (
-        <div className="space-y-4">
-          <div>{cleanText}</div>
-          <div className="rounded-xl overflow-hidden shadow-lg border border-emerald-500/30 aspect-video relative">
-            <iframe
-              className="absolute top-0 left-0 w-full h-full"
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-              title="YouTube Integration"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
+        <div className="mt-4 flex flex-col gap-2">
+          {!isMonkModeActive ? (
+            <div className="rounded-xl overflow-hidden shadow-lg border border-emerald-500/30 aspect-video relative">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                title="YouTube Integration"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          ) : (
+            <div className="rounded-xl flex items-center justify-center shadow-lg border border-purple-500/30 aspect-video bg-black/80">
+              <p className="text-purple-400 font-bold tracking-widest uppercase">Blocked by Monk Mode</p>
+            </div>
+          )}
           <a
             href={`https://www.youtube.com/watch?v=${videoId}`}
             target="_blank"

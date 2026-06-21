@@ -6,6 +6,11 @@ window.addEventListener("message", (event) => {
   if (event.source !== window) return;
 
   if (event.data.source === "FOCUS_FLOW_APP") {
+    if (!chrome || !chrome.runtime || !chrome.runtime.sendMessage) {
+      alert("⚠️ FocusFlow Extension was reloaded but this tab wasn't refreshed!\n\nPlease press F5 to refresh the page so the extension can reconnect.");
+      return;
+    }
+
     if (event.data.type === "START_MONK_MODE") {
       chrome.runtime.sendMessage({ 
         type: "START_MONK_MODE", 

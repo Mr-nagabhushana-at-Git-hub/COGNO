@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Chrome, Shield, Clock, Brain } from "lucide-react";
+import { Chrome, Shield, Clock, Brain, Download } from "lucide-react";
 
 interface MonkModeSettings {
   duration: number; // in minutes
@@ -194,6 +194,27 @@ export default function MonkModeModal({ isOpen, onClose }: MonkModeModalProps) {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Benefits */}
+          <Card className="border-purple-500/30 bg-purple-500/5">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <Download className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  <h3 className="font-medium text-gray-900 dark:text-white">Network Blocker Extension</h3>
+                </div>
+                <a href="/monk-mode-extension.zip" download className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-full font-medium transition-colors">
+                  Download ZIP
+                </a>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                To enforce Monk Mode at the browser level (blocking new tabs to YouTube, Reddit, etc.), install our official Chrome extension. <br/><br/>
+                1. Download the ZIP and extract it.<br/>
+                2. Open <b>chrome://extensions</b> and enable Developer Mode.<br/>
+                3. Click <b>Load Unpacked</b> and select the extracted folder.
+              </p>
             </CardContent>
           </Card>
 

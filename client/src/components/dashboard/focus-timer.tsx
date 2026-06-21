@@ -36,6 +36,12 @@ export default function FocusTimer() {
           taskId: undefined
         });
       }
+      
+      // Auto-trigger Monk Mode overlay and Extension blocking when timer starts
+      const event = new CustomEvent("monk-mode-start", { 
+        detail: { duration: sessionType === "pomodoro" ? 25 : 90 } 
+      });
+      window.dispatchEvent(event);
     }
   };
 

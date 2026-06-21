@@ -38,10 +38,11 @@ export default function Settings() {
   const saveAiKeys = async () => {
     setIsSaving(true);
     try {
+      const deviceId = localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user";
       const response = await fetch("/api/users/settings", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ geminiKey, groqKey }),
+        headers: { "Content-Type": "application/json", "X-Device-Id": deviceId },
+        body: JSON.stringify({ geminiKey: geminiKey || undefined, groqKey: groqKey || undefined }),
       });
       if (!response.ok) throw new Error("Failed to save keys");
       toast({
@@ -80,7 +81,8 @@ export default function Settings() {
     
     setIsSaving(true);
     try {
-      const response = await fetch("/api/users/data", { method: "DELETE" });
+      const deviceId = localStorage.getItem("FOCUSFLOW_DEVICE_ID") || "demo-user";
+      const response = await fetch("/api/users/data", { method: "DELETE", headers: { "X-Device-Id": deviceId } });
       if (!response.ok) throw new Error("Failed to clear data");
       
       // Clear the local device ID to get a fresh start

@@ -8,12 +8,9 @@ import {
   insertFitnessDataSchema,
   insertNotificationSchema,
   journalEntrySchema,
-  insertDiseasePredictionSchema,
-  updateUserSettingsSchema,
   insertJournalSchema
 } from "@shared/schema";
 import { SYMPTOM_CATEGORIES, ALL_SYMPTOMS, formatSymptom, predictRequestSchema, predictWithFallback } from "./ai/disease-predictor";
-import type { DiseasePrediction } from "@shared/schema";
 import { z } from "zod";
 import { createCrisisResponse, detectCrisis } from "./ai/crisis-router";
 import { logEvent, logFailure } from "./ai/logger";
@@ -254,19 +251,6 @@ async function postJsonToPythonService(url: string, body: unknown, timeoutMs = 1
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const getUserId = (req: any) => (req.headers["x-device-id"] || "demo-user") as string;
-
-  // Settings Routes
-  app.patch("/api/users/settings", async (req, res) => {
-    try {
-      const settings = updateUserSettingsSchema.parse(req.body);
-      const updatedUser = await storage.updateUserSettings(getUserId(req), settings);
-      if (!updatedUser) return res.status(404).json({ error: "User not found" });
-      res.json(updatedUser);
-    } catch (error) {
-      if (error instanceof z.ZodError) res.status(400).json({ error: "Invalid settings", details: error.errors });
-      else res.status(500).json({ error: "Failed to update settings" });
-    }
-  });
 
   // Google Fit Auth & Sync Routes
   app.get("/api/auth/google/url", (req, res) => {
@@ -645,69 +629,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Task routes
-  app.get("/api/tasks", async (req, res) => {
-    try {
-      const tasks = await storage.getTasks(getUserId(req));
-      res.json(tasks);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch tasks" });
-    }
-  });
-
-  app.get("/api/tasks/category/:category", async (req, res) => {
-    try {
-      const { category } = req.params;
-      const tasks = await storage.getTasksByCategory(getUserId(req), category);
-      res.json(tasks);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch tasks by category" });
-    }
-  });
-
-  app.post("/api/tasks", async (req, res) => {
-    try {
-      const taskData = insertTaskSchema.parse({ ...req.body, userId: getUserId(req) });
-      const task = await storage.createTask(taskData);
-      res.status(201).json(task);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid task data", details: error.errors });
-      } else {
-        res.status(500).json({ error: "Failed to create task" });
-      }
-    }
-  });
-
-  app.patch("/api/tasks/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateData = req.body;
-      const task = await storage.updateTask(id, getUserId(req), updateData);
-      if (!task) {
-        res.status(404).json({ error: "Task not found" });
-        return;
-      }
-      res.json(task);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to update task" });
-    }
-  });
-
-  app.delete("/api/tasks/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const success = await storage.deleteTask(id, getUserId(req));
-      if (!success) {
-        res.status(404).json({ error: "Task not found" });
-        return;
-      }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ error: "Failed to delete task" });
-    }
-  });
-
   // Focus session routes
   app.get("/api/focus-sessions", async (req, res) => {
     try {
@@ -918,18 +839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/health/symptoms", async (_req, res) => {
-    try {
-      const symptoms = await storage.getHealthSymptoms();
-      res.json(symptoms.map(symptom => ({
-        name: symptom.name,
-        description: symptom.description,
-        category: symptom.category ?? "general"
-      })));
-    } catch {
-      res.status(500).json({ error: "Failed to fetch symptoms" });
-    }
-  });
+  // (symptoms served via /api/health-predict/symptoms below)
 
   app.post("/api/health/predict", async (req, res) => {
     try {
@@ -1285,51 +1195,9 @@ Use this multi-dimensional data to empathize deeply with the user.`;
     }
   });
 
-  // ─── Disease Prediction Routes ───
+  // (disease prediction routes served above via /api/health-predict/*)
 
-  // Get all symptoms grouped by category
-  app.get("/api/health-predict/symptoms", (_req, res) => {
-    const categorized = Object.entries(SYMPTOM_CATEGORIES).map(([category, symptoms]) => ({
-      category,
-      symptoms: symptoms.map((s) => ({ id: s, label: formatSymptom(s) })),
-    }));
-    res.json({ categories: categorized, totalSymptoms: ALL_SYMPTOMS.length });
-  });
-
-  // Run prediction
-  app.post("/api/health-predict/predict", async (req, res) => {
-    try {
-      const body = predictRequestSchema.parse(req.body);
-      logEvent("ENGINE", "disease_predict_request", { symptomCount: body.symptoms.length });
-
-      const result = await predictWithFallback(body.symptoms, body.patientDetails);
-
-      // Store prediction in DB
-      try {
-        await storage.createDiseasePrediction({
-          userId: getUserId(req),
-          symptoms: body.symptoms,
-          prediction: result.prediction,
-          confidence: Math.round(result.confidence),
-          topPredictions: result.topPredictions,
-        });
-      } catch (dbErr) {
-        logFailure("ENGINE", "disease_prediction_save_failed", dbErr);
-      }
-
-      logEvent("ENGINE", "disease_predict_result", { prediction: result.prediction, confidence: result.confidence, source: result.source });
-      res.json(result);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Invalid request", details: error.errors });
-      } else {
-        logFailure("ENGINE", "disease_predict_failed", error);
-        res.status(500).json({ error: "Prediction failed" });
-      }
-    }
-  });
-
-  // Get prediction history
+  // ─── Prediction History ───
   app.get("/api/health-predict/history", async (req, res) => {
     try {
       const predictions = await storage.getDiseasePredictions(getUserId(req));
@@ -1340,10 +1208,12 @@ Use this multi-dimensional data to empathize deeply with the user.`;
     }
   });
 
+  // ─── Settings Save ───
   app.patch("/api/users/settings", async (req, res) => {
     try {
       const { geminiKey, groqKey } = req.body;
       const user = await storage.updateUserSettings(getUserId(req), { geminiKey, groqKey });
+      if (!user) return res.status(404).json({ error: "User not found" });
       res.json(user);
     } catch (e) {
       logFailure("ENGINE", "settings_save_failed", e);
@@ -1351,9 +1221,15 @@ Use this multi-dimensional data to empathize deeply with the user.`;
     }
   });
 
+  // ─── Clear My Data ───
   app.delete("/api/users/data", async (req, res) => {
-    await storage.clearUserData(getUserId(req));
-    res.json({ success: true });
+    try {
+      await storage.clearUserData(getUserId(req));
+      res.json({ success: true });
+    } catch (e) {
+      logFailure("ENGINE", "clear_data_failed", e);
+      res.status(500).json({ error: "Failed to clear data" });
+    }
   });
 
   const httpServer = createServer(app);
